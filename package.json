@@ -1,0 +1,18 @@
+{
+  "name": "vue-dates",
+  "version": "0.0.1",
+  "description": "Yet another datepicker for vue.js",
+  "scripts": {
+    "storybook": "poi --config .storybook/poi.config.js --storybook",
+    "storybook:build": "poi build --config .storybook/poi.config.js --storybook"
+  },
+  "devDependencies": {
+    "@storybook/addon-actions": "^3.2.16",
+    "poi": "^9.5.4",
+    "poi-preset-storybook": "^0.1.0",
+    "storybook-vue": "^3.2.15"
+  },
+  "peerDependencies": {
+    "moment": "^2.19.2"
+  }
+}
