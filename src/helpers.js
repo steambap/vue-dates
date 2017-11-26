@@ -3,7 +3,8 @@ import moment from 'moment';
 import {
   WEEKDAYS,
   DISPLAY_FORMAT,
-  ISO_FORMAT
+  ISO_FORMAT,
+  ISO_MONTH_FORMAT
 } from './constants';
 
 export function contains(arr, elm) {
@@ -80,4 +81,43 @@ export function toISODateString(date, currentFormat) {
   }
 
   return dateObj.format(ISO_FORMAT);
+}
+
+export function getMonths(initialMonth, numberOfMonths, withoutTransitionMonths) {
+  let month = initialMonth.clone();
+  if (!withoutTransitionMonths) {
+    month = month.subtract(1, 'month');
+  }
+
+  const months = [];
+  for (let i = 0; i < (withoutTransitionMonths ? numberOfMonths : numberOfMonths + 2); i++) {
+    months.push(month);
+    month = month.clone().add(1, 'month');
+  }
+
+  return months;
+}
+
+const CALENDAR_MONTH_PADDING = 9;
+
+export function getCalendarMonthWidth(daySize) {
+  return (7 * (daySize + 1)) + (2 * (CALENDAR_MONTH_PADDING + 1));
+}
+
+export function getTransformStyles(transformValue) {
+  return {
+    transform: transformValue,
+    msTransform: transformValue,
+    MozTransform: transformValue,
+    WebkitTransform: transformValue,
+  };
+}
+
+export function toISOMonthString(date, currentFormat) {
+  const dateObj = moment.isMoment(date) ? date : toMomentObject(date, currentFormat);
+  if (!dateObj) {
+    return '';
+  }
+
+  return dateObj.format(ISO_MONTH_FORMAT);
 }

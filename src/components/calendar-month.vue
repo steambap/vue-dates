@@ -135,7 +135,7 @@ export default {
 			};
 		},
 		monthTitle() {
-			this.renderMonth ? this.renderMonth(this.month) : this.month.format(this.monthFormat);
+			return this.renderMonth ? this.renderMonth(this.month) : this.month.format(this.monthFormat);
 		}
 	},
 	methods: {
