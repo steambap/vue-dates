@@ -4,11 +4,12 @@
 		:data-visible="isVisible">
 		<div class="CalendarMonth_caption"
 			:class="{CalendarMonth_caption__verticalScrollable: verticalScrollable}"
+			ref="caption"
 		>
 			<strong>{{monthTitle}}</strong>
 		</div>
 		<table class="CalendarMonth_table">
-			<tbody>
+			<tbody ref="dayGrid">
 				<tr v-for="(week, i) in weeks" :key="i">
 					<calendar-day v-for="(day, dayOfWeek) in week"
 						:key="dayOfWeek"
@@ -35,11 +36,13 @@ import {
 	HORIZONTAL_ORIENTATION,
 	VERTICAL_ORIENTATION,
 	VERTICAL_SCROLLABLE,
-	DAY_SIZE} from '../constants';
+	DAY_SIZE
+} from '../constants';
 import {
 	getCalendarMonthWeeks,
 	isSameDay,
-	toISODateString
+	toISODateString,
+	calculateDimension
 } from '../helpers';
 import CalendarDay from './calendar-day.vue';
 
@@ -99,7 +102,7 @@ export default {
 			type: Number,
 			default: moment.localeData().firstDayOfWeek()
 		},
-		setMonthHeight: {
+		setMonthHeightCb: {
 			type: Function,
 			default: function() {}
 		},
@@ -139,7 +142,29 @@ export default {
 		}
 	},
 	methods: {
-		isSameDay, toISODateString
+		isSameDay, toISODateString,
+		setMonthHeight() {
+			const { setMonthHeightCb } = this;
+			const captionHeight = calculateDimension(
+				this.$refs.caption, 'height', true, true);
+			const gridHeight = calculateDimension(this.$refs.dayGrid, 'height');
+
+			setMonthHeightCb(captionHeight + gridHeight + 1);
+		}
+	},
+	beforeCreate() {
+		// Timer is not reactive
+		this.setMonthHeightTimer = 0;
+	},
+	mounted() {
+		this.setMonthHeightTimer = setTimeout(() => {
+			this.setMonthHeight();
+		}, 0);
+	},
+	beforeDestroy() {
+		if (this.setMonthHeightTimer) {
+			clearTimeout(this.setMonthHeightTimer);
+		}
 	}
 }
 </script>

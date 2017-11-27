@@ -2,6 +2,7 @@
 	<div class="CalendarMonthGrid"
 		:class="monthGridClass"
 		:style="monthGridStyles"
+		ref="container"
 	>
 		<div
 			v-for="month in monthList"
@@ -25,7 +26,7 @@
 				:day-size="daySize"
 				:focused-date="month.isVisible ? focusedDate : null"
 				:is-focused="isFocused"
-				:set-month-height="function(){}"
+				:set-month-height="month.setMonthHeight"
 			></calendar-month>
 		</div>
 	</div>
@@ -38,7 +39,8 @@ import {
 	getMonths,
 	getCalendarMonthWidth,
 	getTransformStyles,
-	toISOMonthString
+	toISOMonthString,
+	isTransitionEndSupported
 } from '../helpers';
 import {
 	HORIZONTAL_ORIENTATION,
@@ -140,12 +142,6 @@ export default {
 			default: 'MMMM YYYY'
 		}
 	},
-	data() {
-		const withoutTransitionMonths = this.orientation === VERTICAL_SCROLLABLE;
-		return {
-			months: getMonths(this.initialMonth, this.numberOfMonths, withoutTransitionMonths)
-		};
-	},
 	computed: {
 		isVertical() {
 			return this.orientation === VERTICAL_ORIENTATION;
@@ -180,7 +176,10 @@ export default {
 			};
 		},
 		monthList() {
-			return this.months.map((month, i) => {
+			const withoutTransitionMonths = this.orientation === VERTICAL_SCROLLABLE;
+			const months = getMonths(this.initialMonth, this.numberOfMonths, withoutTransitionMonths);
+
+			return months.map((month, i) => {
 				const isVisible = (i >= this.firstVisibleMonthIndex) && (i < this.firstVisibleMonthIndex + this.numberOfMonths);
 				const hideForAnimation = i === 0 && !isVisible;
 				const showForAnimation = i === 0 && this.isAnimating && isVisible;
@@ -192,7 +191,7 @@ export default {
 				const styles = {};
 				if (showForAnimation && !this.isVertical && !this.isRTL) {
 					styles.position = 'absolute';
-					styles.left = - this.calendarMonthWidth;
+					styles.left = - this.calendarMonthWidth + 'px';
 				}
 				if (showForAnimation && !this.isVertical && this.isRTL) {
 					styles.position = 'absolute';
@@ -200,17 +199,74 @@ export default {
 				}
 				if (showForAnimation && this.isVertical) {
 					styles.position = 'absolute';
-					//styles.top = 
+					styles.top = -this.calendarMonthHeights[0] + 'px';
 				}
-				// const setMonthHeight = (height) => this.setMonthHeight(height, i);
+				const setMonthHeight = (height) => this.setMonthHeight(height, i);
 
 				return {
 					isVisible, hideForAnimation, showForAnimation, monthString,
-					cssClass, styles,
+					cssClass, styles, setMonthHeight,
 					key: i,
 					data: month
 				};
 			});
+		},
+		isTransitionEndSupported
+	},
+	methods: {
+		setMonthHeight(height, idx) {
+			if (this.calendarMonthHeights[idx]) {
+				if (idx === 0) {
+					this.calendarMonthHeights = [height].concat(this.calendarMonthHeights.slice(0, -1));
+				} else if (idx === this.calendarMonthHeights.length - 1) {
+					this.calendarMonthHeights = this.calendarMonthHeights.slice(1).concat(height);
+				}
+			} else {
+				this.calendarMonthHeights[idx] = height;
+			}
+		}
+	},
+	beforeCreate() {
+		// Non-reactive members
+		this.calendarMonthHeights = [];
+		this.locale = moment.locale();
+		this.setCalendarMonthHeightsTimer = 0;
+		this.removeEventListener = null;
+	},
+	mounted() {
+		const { setCalendarMonthHeights } = this;
+		this.removeEventListener = addEventListener(
+			this.$refs.container,
+			'transitionend',
+			this.onTransitionEnd
+		);
+
+		this.setCalendarMonthHeightsTimer = setTimeout(() => {
+			this.setCalendarMonthHeights(this.calendarMonthHeights);
+		}, 0);
+	},
+	updated() {
+		// For IE9, immediately call onMonthTransitionEnd instead of
+		// waiting for the animation to complete
+		if (!this.isTransitionEndSupported && this.isAnimating) {
+			this.onMonthTransitionEnd();
+		}
+	},
+	beforeDestroy() {
+		if (this.removeEventListener) {
+			this.removeEventListener();
+		}
+		if (this.setCalendarMonthHeightsTimer) {
+			clearTimeout(this.setCalendarMonthHeightsTimer);
+		}
+	},
+	watch: {
+		isAnimating: function (oldVal, newVal) {
+			if (!newVal && oldVal) {
+				this.setCalendarMonthHeightsTimer = setTimeout(() => {
+					this.setCalendarMonthHeights(this.calendarMonthHeights);
+				}, 0);
+			}
 		}
 	}
 }

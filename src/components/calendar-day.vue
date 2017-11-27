@@ -9,6 +9,7 @@
 			@mouseleave="onMouseLeave($event)"
 			@click="onClick($event)"
 			:tabindex="tabIndex"
+			ref="button"
 		>
 			{{formatDay}}
 		</button>
@@ -120,6 +121,15 @@ export default {
 		},
 		onClick(e) {
 			this.onDayClick(this.day, e);
+		}
+	},
+	watch: {
+		tabIndex: function (oldVal, newVal) {
+			if (newVal === 0) {
+				if (this.isFocused || newVal !== oldVal) {
+					this.$refs.button.focus();
+				}
+			}
 		}
 	}
 }

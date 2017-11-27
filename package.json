@@ -6,13 +6,21 @@
     "storybook": "poi --config .storybook/poi.config.js --storybook",
     "storybook:build": "poi build --config .storybook/poi.config.js --storybook"
   },
+  "keywords": [
+    "vue",
+    "datepicker"
+  ],
+  "author": {
+    "name": "Weilin Shi",
+    "email": "934587911@qq.com",
+    "url": "http://weilinshi.org"
+  },
+  "license": "MIT",
   "devDependencies": {
     "@storybook/addon-actions": "^3.2.16",
+    "moment": "^2.19.2",
     "poi": "^9.5.4",
     "poi-preset-storybook": "^0.1.0",
     "storybook-vue": "^3.2.15"
-  },
-  "peerDependencies": {
-    "moment": "^2.19.2"
   }
 }
