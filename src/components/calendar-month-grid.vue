@@ -231,12 +231,10 @@ export default {
 		this.calendarMonthHeights = [];
 		this.locale = moment.locale();
 		this.setCalendarMonthHeightsTimer = 0;
-		this.removeEventListener = null;
 	},
 	mounted() {
 		const { setCalendarMonthHeights } = this;
-		this.removeEventListener = addEventListener(
-			this.$refs.container,
+		this.$refs.container.addEventListener(
 			'transitionend',
 			this.onTransitionEnd
 		);
@@ -253,9 +251,10 @@ export default {
 		}
 	},
 	beforeDestroy() {
-		if (this.removeEventListener) {
-			this.removeEventListener();
-		}
+		this.$refs.container.removeEventListener(
+			'transitionend',
+			this.onTransitionEnd
+		)
 		if (this.setCalendarMonthHeightsTimer) {
 			clearTimeout(this.setCalendarMonthHeightsTimer);
 		}
