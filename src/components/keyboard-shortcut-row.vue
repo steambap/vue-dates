@@ -66,7 +66,7 @@ export default {
 }
 .KeyboardShortcutRow_action {
   display: inline;
-  word-break: break-all;
+  word-wrap: break-word;
   margin-left: 8px;
 }
 </style>

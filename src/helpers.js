@@ -4,7 +4,8 @@ import {
   WEEKDAYS,
   DISPLAY_FORMAT,
   ISO_FORMAT,
-  ISO_MONTH_FORMAT
+  ISO_MONTH_FORMAT,
+  ANCHOR_LEFT
 } from "./constants";
 
 export function contains(arr, elm) {
@@ -191,4 +192,76 @@ export function calculateDimension(
 
 export function isTransitionEndSupported() {
   return Boolean(typeof window !== "undefined" && "TransitionEvent" in window);
+}
+
+export function isBeforeDay(a, b) {
+  if (!moment.isMoment(a) || !moment.isMoment(b)) {
+    return false;
+  }
+
+  const aYear = a.year();
+  const aMonth = a.month();
+
+  const bYear = b.year();
+  const bMonth = b.month();
+
+  const isSameYear = aYear === bYear;
+  const isSameMonth = aMonth === bMonth;
+
+  if (isSameYear && isSameMonth) {
+    return a.date() < b.date();
+  }
+  if (isSameYear) {
+    return aMonth < bMonth;
+  }
+  return aYear < bYear;
+}
+
+export function isAfterDay(a, b) {
+  return !isBeforeDay(a, b) && !isSameDay(a, b);
+}
+
+export function isDayVisible(day, month, numberOfMonths, enableOutsideDays) {
+  let firstDayOfFirstMonth = month.clone().startOf("month");
+  if (enableOutsideDays) {
+    firstDayOfFirstMonth = firstDayOfFirstMonth.startOf("week");
+  }
+  if (isBeforeDay(day, firstDayOfFirstMonth)) {
+    return false;
+  }
+
+  let lastDayOfLastMonth = month
+    .clone()
+    .add(numberOfMonths - 1, "month")
+    .endOf("month");
+  if (enableOutsideDays) {
+    lastDayOfLastMonth = lastDayOfLastMonth.endOf("week");
+  }
+
+  return !isAfterDay(day, lastDayOfLastMonth);
+}
+
+export function getActiveElement() {
+  return typeof document !== "undefined" && document.activeElement;
+}
+
+export function getResponsiveContainerStyles(
+  anchorDirection,
+  currentOffset,
+  containerEdge,
+  margin
+) {
+  const windowWidth = typeof window !== "undefined" ? window.innerWidth : 0;
+  const calculatedOffset =
+    anchorDirection === ANCHOR_LEFT
+      ? windowWidth - containerEdge
+      : containerEdge;
+  const calculatedMargin = margin || 0;
+
+  return {
+    [anchorDirection]: Math.min(
+      currentOffset + calculatedOffset - calculatedMargin,
+      0
+    )
+  };
 }
