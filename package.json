@@ -21,6 +21,7 @@
     "moment": "^2.19.2",
     "poi": "^9.5.4",
     "poi-preset-storybook": "^0.1.0",
-    "storybook-vue": "^3.2.15"
+    "storybook-vue": "^3.2.15",
+    "vue-feather-icons": "^0.1.1"
   }
 }
