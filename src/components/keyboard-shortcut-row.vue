@@ -17,7 +17,7 @@
 
 <script>
 export default {
-  name: 'keyboard-shortcut-row',
+  name: "keyboard-shortcut-row",
   props: {
     unicode: {
       type: String,
@@ -36,7 +36,7 @@ export default {
       default: false
     }
   }
-}
+};
 </script>
 
 <style>

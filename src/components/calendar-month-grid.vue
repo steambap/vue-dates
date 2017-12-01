@@ -33,273 +33,288 @@
 </template>
 
 <script>
-import moment from 'moment';
-import CalendarMonth from './calendar-month.vue';
+import moment from "moment";
+import CalendarMonth from "./calendar-month.vue";
 import {
-	getMonths,
-	getCalendarMonthWidth,
-	getTransformStyles,
-	toISOMonthString,
-	isTransitionEndSupported
-} from '../helpers';
+  getMonths,
+  getCalendarMonthWidth,
+  getTransformStyles,
+  toISOMonthString,
+  isTransitionEndSupported
+} from "../helpers";
 import {
-	HORIZONTAL_ORIENTATION,
-	VERTICAL_SCROLLABLE,
-	VERTICAL_ORIENTATION,
-	DAY_SIZE
-} from '../constants';
+  HORIZONTAL_ORIENTATION,
+  VERTICAL_SCROLLABLE,
+  VERTICAL_ORIENTATION,
+  DAY_SIZE
+} from "../constants";
 
 export default {
-	name: 'calendar-month-grid',
-	components: {CalendarMonth},
-	props: {
-		enableOutsideDays: {
-			type: Boolean,
-			default: false
-		},
-		firstVisibleMonthIndex: {
-			type: Number,
-			default: 0
-		},
-		initialMonth: {
-			type: moment,
-			default: function() {
-				return moment();
-			}
-		},
-		isAnimating: {
-			type: Boolean,
-			default: false
-		},
-		numberOfMonths: {
-			type: Number,
-			default: 1
-		},
-		modifiers: {
-			type: Object,
-			default: function() {
-				return {};
-			}
-		},
-		orientation: {
-			type: String,
-			default: HORIZONTAL_ORIENTATION
-		},
-		onDayClick: {
-			type: Function,
-			default: function() {}
-		},
-		onDayMouseEnter: {
-			type: Function,
-			default: function() {}
-		},
-		onDayMouseLeave: {
-			type: Function,
-			default: function() {}
-		},
-		onMonthTransitionEnd: {
-			type: Function,
-			default: function() {}
-		},
-		renderDay: {
-			type: Function,
-			default: null
-		},
-		renderMonth: {
-			type: Function,
-			default: null
-		},
-		transformValue: {
-			type: String,
-			default: 'none'
-		},
-		daySize: {
-			type: Number,
-			default: DAY_SIZE
-		},
-		focusedDate: {
-			type: moment,
-			default: null
-		},
-		isFocused: {
-			type: Boolean,
-			default: false
-		},
-		firstDayOfWeek: {
-			type: Number,
-			default: moment.localeData().firstDayOfWeek()
-		},
-		setCalendarMonthHeights: {
-			type: Function,
-			default: function() {}
-		},
-		isRTL: {
-			type: Boolean,
-			default: false
-		},
-		monthFormat: {
-			type: String,
-			default: 'MMMM YYYY'
-		}
-	},
-	computed: {
-		isVertical() {
-			return this.orientation === VERTICAL_ORIENTATION;
-		},
-		isVerticalScrollable() {
-			return this.orientation === VERTICAL_SCROLLABLE;
-		},
-		isHorizontal() {
-			return this.orientation === HORIZONTAL_ORIENTATION;
-		},
-		calendarMonthWidth() {
-			return getCalendarMonthWidth(this.daySize);
-		},
-		gridWidth() {
-			return this.isVertical || this.isVerticalScrollable ?
-				this.calendarMonthWidth :
-				(this.numberOfMonths + 2) * this.calendarMonthWidth;
-		},
-		monthGridClass() {
-			return {
-				CalendarMonthGrid__horizontal: this.isHorizontal,
-				CalendarMonthGrid__vertical: this.isVertical,
-				CalendarMonthGrid__vertical_scrollable: this.isVerticalScrollable,
-				CalendarMonthGrid__animating: this.isAnimating
-			};
-		},
-		monthGridStyles() {
-			return {
-				transition: this.isAnimating ? 'transform 0.2s ease-in-out' : 'none',
-				width: this.gridWidth + 'px',
-				...getTransformStyles(this.transformValue)
-			};
-		},
-		monthList() {
-			const withoutTransitionMonths = this.orientation === VERTICAL_SCROLLABLE;
-			const months = getMonths(this.initialMonth, this.numberOfMonths, withoutTransitionMonths);
+  name: "calendar-month-grid",
+  components: { CalendarMonth },
+  props: {
+    enableOutsideDays: {
+      type: Boolean,
+      default: false
+    },
+    firstVisibleMonthIndex: {
+      type: Number,
+      default: 0
+    },
+    initialMonth: {
+      type: moment,
+      default: function() {
+        return moment();
+      }
+    },
+    isAnimating: {
+      type: Boolean,
+      default: false
+    },
+    numberOfMonths: {
+      type: Number,
+      default: 1
+    },
+    modifiers: {
+      type: Object,
+      default: function() {
+        return {};
+      }
+    },
+    orientation: {
+      type: String,
+      default: HORIZONTAL_ORIENTATION
+    },
+    onDayClick: {
+      type: Function,
+      default: function() {}
+    },
+    onDayMouseEnter: {
+      type: Function,
+      default: function() {}
+    },
+    onDayMouseLeave: {
+      type: Function,
+      default: function() {}
+    },
+    onMonthTransitionEnd: {
+      type: Function,
+      default: function() {}
+    },
+    renderDay: {
+      type: Function,
+      default: null
+    },
+    renderMonth: {
+      type: Function,
+      default: null
+    },
+    transformValue: {
+      type: String,
+      default: "none"
+    },
+    daySize: {
+      type: Number,
+      default: DAY_SIZE
+    },
+    focusedDate: {
+      type: moment,
+      default: null
+    },
+    isFocused: {
+      type: Boolean,
+      default: false
+    },
+    firstDayOfWeek: {
+      type: Number,
+      default: moment.localeData().firstDayOfWeek()
+    },
+    setCalendarMonthHeights: {
+      type: Function,
+      default: function() {}
+    },
+    isRTL: {
+      type: Boolean,
+      default: false
+    },
+    monthFormat: {
+      type: String,
+      default: "MMMM YYYY"
+    }
+  },
+  computed: {
+    isVertical() {
+      return this.orientation === VERTICAL_ORIENTATION;
+    },
+    isVerticalScrollable() {
+      return this.orientation === VERTICAL_SCROLLABLE;
+    },
+    isHorizontal() {
+      return this.orientation === HORIZONTAL_ORIENTATION;
+    },
+    calendarMonthWidth() {
+      return getCalendarMonthWidth(this.daySize);
+    },
+    gridWidth() {
+      return this.isVertical || this.isVerticalScrollable
+        ? this.calendarMonthWidth
+        : (this.numberOfMonths + 2) * this.calendarMonthWidth;
+    },
+    monthGridClass() {
+      return {
+        CalendarMonthGrid__horizontal: this.isHorizontal,
+        CalendarMonthGrid__vertical: this.isVertical,
+        CalendarMonthGrid__vertical_scrollable: this.isVerticalScrollable,
+        CalendarMonthGrid__animating: this.isAnimating
+      };
+    },
+    monthGridStyles() {
+      return {
+        transition: this.isAnimating ? "transform 0.2s ease-in-out" : "none",
+        width: this.gridWidth + "px",
+        ...getTransformStyles(this.transformValue)
+      };
+    },
+    monthList() {
+      const withoutTransitionMonths = this.orientation === VERTICAL_SCROLLABLE;
+      const months = getMonths(
+        this.initialMonth,
+        this.numberOfMonths,
+        withoutTransitionMonths
+      );
 
-			return months.map((month, i) => {
-				const isVisible = (i >= this.firstVisibleMonthIndex) && (i < this.firstVisibleMonthIndex + this.numberOfMonths);
-				const hideForAnimation = i === 0 && !isVisible;
-				const showForAnimation = i === 0 && this.isAnimating && isVisible;
-				const monthString = toISOMonthString(month);
-				const cssClass = {
-					CalendarMonthGrid_month__horizontal: this.isHorizontal,
-					CalendarMonthGrid_month__hideForAnimation: hideForAnimation
-				};
-				const styles = {};
-				if (showForAnimation && !this.isVertical && !this.isRTL) {
-					styles.position = 'absolute';
-					styles.left = - this.calendarMonthWidth + 'px';
-				}
-				if (showForAnimation && !this.isVertical && this.isRTL) {
-					styles.position = 'absolute';
-					styles.right = 0;
-				}
-				if (showForAnimation && this.isVertical) {
-					styles.position = 'absolute';
-					styles.top = -this.calendarMonthHeights[0] + 'px';
-				}
-				const setMonthHeight = (height) => this.setMonthHeight(height, i);
+      return months.map((month, i) => {
+        const isVisible =
+          i >= this.firstVisibleMonthIndex &&
+          i < this.firstVisibleMonthIndex + this.numberOfMonths;
+        const hideForAnimation = i === 0 && !isVisible;
+        const showForAnimation = i === 0 && this.isAnimating && isVisible;
+        const monthString = toISOMonthString(month);
+        const cssClass = {
+          CalendarMonthGrid_month__horizontal: this.isHorizontal,
+          CalendarMonthGrid_month__hideForAnimation: hideForAnimation
+        };
+        const styles = {};
+        if (showForAnimation && !this.isVertical && !this.isRTL) {
+          styles.position = "absolute";
+          styles.left = -this.calendarMonthWidth + "px";
+        }
+        if (showForAnimation && !this.isVertical && this.isRTL) {
+          styles.position = "absolute";
+          styles.right = 0;
+        }
+        if (showForAnimation && this.isVertical) {
+          styles.position = "absolute";
+          styles.top = -this.calendarMonthHeights[0] + "px";
+        }
+        const setMonthHeight = height => this.setMonthHeight(height, i);
 
-				return {
-					isVisible, hideForAnimation, showForAnimation, monthString,
-					cssClass, styles, setMonthHeight,
-					key: i,
-					data: month
-				};
-			});
-		},
-		isTransitionEndSupported
-	},
-	methods: {
-		setMonthHeight(height, idx) {
-			if (this.calendarMonthHeights[idx]) {
-				if (idx === 0) {
-					this.calendarMonthHeights = [height].concat(this.calendarMonthHeights.slice(0, -1));
-				} else if (idx === this.calendarMonthHeights.length - 1) {
-					this.calendarMonthHeights = this.calendarMonthHeights.slice(1).concat(height);
-				}
-			} else {
-				this.calendarMonthHeights[idx] = height;
-			}
-		}
-	},
-	beforeCreate() {
-		// Non-reactive members
-		this.calendarMonthHeights = [];
-		this.locale = moment.locale();
-		this.setCalendarMonthHeightsTimer = 0;
-	},
-	mounted() {
-		const { setCalendarMonthHeights } = this;
-		this.$refs.container.addEventListener(
-			'transitionend',
-			this.onTransitionEnd
-		);
+        return {
+          isVisible,
+          hideForAnimation,
+          showForAnimation,
+          monthString,
+          cssClass,
+          styles,
+          setMonthHeight,
+          key: i,
+          data: month
+        };
+      });
+    },
+    isTransitionEndSupported
+  },
+  methods: {
+    setMonthHeight(height, idx) {
+      if (this.calendarMonthHeights[idx]) {
+        if (idx === 0) {
+          this.calendarMonthHeights = [height].concat(
+            this.calendarMonthHeights.slice(0, -1)
+          );
+        } else if (idx === this.calendarMonthHeights.length - 1) {
+          this.calendarMonthHeights = this.calendarMonthHeights
+            .slice(1)
+            .concat(height);
+        }
+      } else {
+        this.calendarMonthHeights[idx] = height;
+      }
+    }
+  },
+  beforeCreate() {
+    // Non-reactive members
+    this.calendarMonthHeights = [];
+    this.locale = moment.locale();
+    this.setCalendarMonthHeightsTimer = 0;
+  },
+  mounted() {
+    const { setCalendarMonthHeights } = this;
+    this.$refs.container.addEventListener(
+      "transitionend",
+      this.onTransitionEnd
+    );
 
-		this.setCalendarMonthHeightsTimer = setTimeout(() => {
-			this.setCalendarMonthHeights(this.calendarMonthHeights);
-		}, 0);
-	},
-	updated() {
-		// For IE9, immediately call onMonthTransitionEnd instead of
-		// waiting for the animation to complete
-		if (!this.isTransitionEndSupported && this.isAnimating) {
-			this.onMonthTransitionEnd();
-		}
-	},
-	beforeDestroy() {
-		this.$refs.container.removeEventListener(
-			'transitionend',
-			this.onTransitionEnd
-		)
-		if (this.setCalendarMonthHeightsTimer) {
-			clearTimeout(this.setCalendarMonthHeightsTimer);
-		}
-	},
-	watch: {
-		isAnimating: function (oldVal, newVal) {
-			if (!newVal && oldVal) {
-				this.setCalendarMonthHeightsTimer = setTimeout(() => {
-					this.setCalendarMonthHeights(this.calendarMonthHeights);
-				}, 0);
-			}
-		}
-	}
-}
+    this.setCalendarMonthHeightsTimer = setTimeout(() => {
+      this.setCalendarMonthHeights(this.calendarMonthHeights);
+    }, 0);
+  },
+  updated() {
+    // For IE9, immediately call onMonthTransitionEnd instead of
+    // waiting for the animation to complete
+    if (!this.isTransitionEndSupported && this.isAnimating) {
+      this.onMonthTransitionEnd();
+    }
+  },
+  beforeDestroy() {
+    this.$refs.container.removeEventListener(
+      "transitionend",
+      this.onTransitionEnd
+    );
+    if (this.setCalendarMonthHeightsTimer) {
+      clearTimeout(this.setCalendarMonthHeightsTimer);
+    }
+  },
+  watch: {
+    isAnimating: function(oldVal, newVal) {
+      if (!newVal && oldVal) {
+        this.setCalendarMonthHeightsTimer = setTimeout(() => {
+          this.setCalendarMonthHeights(this.calendarMonthHeights);
+        }, 0);
+      }
+    }
+  }
+};
 </script>
 
 <style>
 .CalendarMonthGrid {
-	background: #fff;
-	text-align: center;
-	z-index: 0;
+  background: #fff;
+  text-align: center;
+  z-index: 0;
 }
 .CalendarMonthGrid__animating {
-	z-index: 1;
+  z-index: 1;
 }
 .CalendarMonthGrid__horizontal {
-	position: absolute;
-	left: 9px;
+  position: absolute;
+  left: 9px;
 }
 .CalendarMonthGrid__vertical {
-	margin: 0 auto;
+  margin: 0 auto;
 }
 .CalendarMonthGrid__vertical_scrollable {
-	margin: 0 auto;
-	overflow-y: scroll;
+  margin: 0 auto;
+  overflow-y: scroll;
 }
 .CalendarMonthGrid_month__horizontal {
-	display: inline-block;
-	vertical-align: top;
-	min-height: 100%;
+  display: inline-block;
+  vertical-align: top;
+  min-height: 100%;
 }
 .CalendarMonthGrid_month__hideForAnimation {
-	position: absolute;
-	z-index: -1;
-	opacity: 0;
-	pointer-events: none;
+  position: absolute;
+  z-index: -1;
+  opacity: 0;
+  pointer-events: none;
 }
 </style>

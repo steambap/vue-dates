@@ -8,13 +8,8 @@ import DayPickerNavigation from "../components/day-picker-navigation.vue";
 
 storiesOf("internal", module)
   .add("CalendayDay", () => ({
-    methods: {
-      handleClick() {
-        action("button-click")("You clicked on CalendarDay component");
-      }
-    },
     render() {
-      return <CalendarDay nativeOnClick={this.handleClick} />;
+      return <CalendarDay />;
     }
   }))
   .add("CalendarMonth", () => ({

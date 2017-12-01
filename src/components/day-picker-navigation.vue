@@ -32,12 +32,12 @@ import {
   ArrowRightIcon,
   ArrowUpIcon,
   ArrowDownIcon
-} from 'vue-feather-icons';
+} from "vue-feather-icons";
 
-import {HORIZONTAL_ORIENTATION, VERTICAL_SCROLLABLE} from '../constants';
+import { HORIZONTAL_ORIENTATION, VERTICAL_SCROLLABLE } from "../constants";
 
 export default {
-  name: 'day-picker-navigation',
+  name: "day-picker-navigation",
   components: {
     ArrowLeftIcon,
     ArrowRightIcon,
@@ -76,7 +76,8 @@ export default {
       return {
         DayPickerNavigation_container__horizontal: this.isHorizontal,
         DayPickerNavigation_container__vertical: this.isVertical,
-        DayPickerNavigation_container__verticalScrollable: this.isVerticalScrollable
+        DayPickerNavigation_container__verticalScrollable: this
+          .isVerticalScrollable
       };
     },
     navPrevClass() {
@@ -115,7 +116,8 @@ export default {
       }
 
       return {
-        DayPickerNavigation_nextButton__verticalScrollable: this.isVerticalScrollable,
+        DayPickerNavigation_nextButton__verticalScrollable: this
+          .isVerticalScrollable,
         ...baseClass
       };
     },
@@ -126,7 +128,7 @@ export default {
       };
     }
   }
-}
+};
 </script>
 
 
