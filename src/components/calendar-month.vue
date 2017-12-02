@@ -11,19 +11,20 @@
 		<table class="CalendarMonth_table">
 			<tbody ref="dayGrid">
 				<tr v-for="(week, i) in weeks" :key="i">
-					<calendar-day v-for="(day, dayOfWeek) in week"
+					<component v-for="(day, dayOfWeek) in week"
+            :is="day ? 'CalendarDay' : 'td'"
 						:key="dayOfWeek"
 						:day="day"
 						:day-size="daySize"
 						:is-outside-day="!day || day.month() !== month.month()"
 						:tab-index="isVisible && isSameDay(day, focusedDate) ? 0 : -1"
 						:is-focused="isFocused"
-						:on-day-mouse-enter="onDayMouseEnter"
-						:on-day-mouse-leave="onDayMouseLeave"
-						:on-day-click="onDayClick"
+						:handle-day-mouse-enter="handleDayMouseEnter"
+						:handle-day-mouse-leave="handleDayMouseLeave"
+						:handle-day-click="handleDayClick"
 						:render-day="renderDay"
 						:modifiers="modifiers[toISODateString(day)]"
-					></calendar-day>
+					></component>
 				</tr>
 			</tbody>
 		</table>
@@ -78,15 +79,15 @@ export default {
       type: Number,
       default: DAY_SIZE
     },
-    onDayClick: {
+    handleDayClick: {
       type: Function,
       default: function() {}
     },
-    onDayMouseEnter: {
+    handleDayMouseEnter: {
       type: Function,
       default: function() {}
     },
-    onDayMouseLeave: {
+    handleDayMouseLeave: {
       type: Function,
       default: function() {}
     },

@@ -17,9 +17,9 @@
 				:modifiers="modifiers[month.monthString]"
 				:month-format="monthFormat"
 				:orientation="orientation"
-				:on-day-mouse-enter="onDayMouseEnter"
-				:on-day-mouse-leave="onDayMouseLeave"
-				:on-day-click="onDayClick"
+				:handle-day-mouse-enter="handleDayMouseEnter"
+				:handle-day-mouse-leave="handleDayMouseLeave"
+				:handle-day-click="handleDayClick"
 				:render-month="renderMonth"
 				:render-day="renderDay"
 				:first-day-of-week="firstDayOfWeek"
@@ -85,15 +85,15 @@ export default {
       type: String,
       default: HORIZONTAL_ORIENTATION
     },
-    onDayClick: {
+    handleDayClick: {
       type: Function,
       default: function() {}
     },
-    onDayMouseEnter: {
+    handleDayMouseEnter: {
       type: Function,
       default: function() {}
     },
-    onDayMouseLeave: {
+    handleDayMouseLeave: {
       type: Function,
       default: function() {}
     },

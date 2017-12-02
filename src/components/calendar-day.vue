@@ -20,6 +20,7 @@
 import moment from "moment";
 import { DAY_SIZE } from "../constants";
 import { contains } from "../helpers";
+import { CalendarDayPhrases } from "../phrases";
 
 export default {
   name: "calendar-day",
@@ -52,21 +53,31 @@ export default {
       type: Number,
       default: -1
     },
-    onDayClick: {
+    handleDayClick: {
       type: Function,
       default: function() {}
     },
-    onDayMouseEnter: {
+    handleDayMouseEnter: {
       type: Function,
       default: function() {}
     },
-    onDayMouseLeave: {
+    handleDayMouseLeave: {
       type: Function,
       default: function() {}
     },
     renderDay: {
       type: Function,
       default: null
+    },
+    ariaLabelFormat: {
+      type: String,
+      default: "dddd, LL"
+    },
+    phrases: {
+      type: Object,
+      default: function() {
+        return CalendarDayPhrases;
+      }
     }
   },
   computed: {
@@ -130,13 +141,13 @@ export default {
   },
   methods: {
     onMouseEnter(e) {
-      this.onDayMouseEnter(this.day, e);
+      this.handleDayMouseEnter(this.day, e);
     },
     onMouseLeave(e) {
-      this.onDayMouseLeave(this.day, e);
+      this.handleDayMouseLeave(this.day, e);
     },
     onClick(e) {
-      this.onDayClick(this.day, e);
+      this.handleDayClick(this.day, e);
     }
   },
   watch: {
@@ -169,8 +180,8 @@ export default {
   height: 100%;
   width: 100%;
   text-align: center;
-  background: transparent;
-  border: none;
+  background: none;
+  border: 0;
   margin: 0;
   padding: 0;
   color: inherit;

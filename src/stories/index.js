@@ -5,26 +5,24 @@ import CalendarDay from "../components/calendar-day.vue";
 import CalendarMonth from "../components/calendar-month.vue";
 import CalendarMonthGrid from "../components/calendar-month-grid.vue";
 import DayPickerNavigation from "../components/day-picker-navigation.vue";
+import DayPickerKeyboardShortcuts from "../components/day-picker-keyboard-shortcuts.vue";
 
 storiesOf("internal", module)
   .add("CalendayDay", () => ({
     render() {
-      return <CalendarDay />;
+      return (
+        <CalendarDay handleDayClick={() => action("day-click")("Clicked!")} />
+      );
     }
   }))
   .add("CalendarMonth", () => ({
     render() {
-      return (
-        <CalendarMonth
-          enableOutsideDays={true}
-          style={{ display: "inline-block" }}
-        />
-      );
+      return <CalendarMonth style={{ display: "inline-block" }} />;
     }
   }))
   .add("CalendarMonthGrid", () => ({
     render() {
-      return <CalendarMonthGrid enableOutsideDays={true} />;
+      return <CalendarMonthGrid />;
     }
   }))
   .add("DayPickerNavigation", () => ({
@@ -43,5 +41,10 @@ storiesOf("internal", module)
           handleNextMonthClick={this.onNextClick}
         />
       );
+    }
+  }))
+  .add("DayPickerKeyboardShortcuts", () => ({
+    render() {
+      return <DayPickerKeyboardShortcuts showKeyboardShortcutsPanel={true} />;
     }
   }));

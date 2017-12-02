@@ -6,7 +6,7 @@
       v-if="!isVerticalScrollable"
       type="button"
       @click="handlePrevMonthClick"
-      @mouseup="e => e.currentTarget.blur()"
+      @mouseup="blur($event)"
     >
       <arrow-right-icon v-if="isHorizontal && isRTL" :class="svgIconClass"></arrow-right-icon>
       <arrow-left-icon v-else-if="isHorizontal" :class="svgIconClass"></arrow-left-icon>
@@ -17,7 +17,7 @@
       :class="navNextClass"
       type="button"
       @click="handleNextMonthClick"
-      @mouseup="e => e.currentTarget.blur()"
+      @mouseup="blur($event)"
     >
       <arrow-left-icon v-if="isHorizontal && isRTL" :class="svgIconClass"></arrow-left-icon>
       <arrow-right-icon v-else-if="isHorizontal" :class="svgIconClass"></arrow-right-icon>
@@ -126,6 +126,11 @@ export default {
         DayPickerNavigation_svg__horizontal: this.isHorizontal,
         DayPickerNavigation_svg__vertical: this.isVertical
       };
+    }
+  },
+  methods: {
+    blur(e) {
+      e.currentTarget.blur();
     }
   }
 };
