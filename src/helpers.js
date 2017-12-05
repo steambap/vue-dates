@@ -265,3 +265,19 @@ export function getResponsiveContainerStyles(
     )
   };
 }
+
+export function isTouchSupported() {
+  return (
+    Boolean(
+      typeof window !== "undefined" &&
+        ("ontouchstart" in window ||
+          (window.DocumentTouch &&
+            typeof document !== "undefined" &&
+            document instanceof window.DocumentTouch))
+    ) ||
+    Boolean(
+      typeof navigator !== "undefined" &&
+        (navigator.maxTouchPoints || navigator.msMaxTouchPoints)
+    )
+  );
+}

@@ -63,6 +63,7 @@
 import { DayPickerKeyboardShortcutsPhrases } from "../phrases";
 import { XIcon } from "vue-feather-icons";
 import KeyboardShortcutRow from "./keyboard-shortcut-row.vue";
+import { keys } from "../constants";
 
 export const TOP_LEFT = "top-left";
 export const TOP_RIGHT = "top-right";
@@ -140,8 +141,8 @@ export default {
     // amount to a very basic focus trap. The user can exit the panel by "pressing" the
     // close button or hitting escape
     switch (e.keyCode) {
-      case 32: // Space
-      case 27: // Escape
+      case keys.space:
+      case keys.esc:
         e.stopPropagation();
         closeKeyboardShortcutsPanel();
         break;
@@ -149,20 +150,20 @@ export default {
       // Only stopPropagation here - this allows the up and down arrows continue their
       // default behavior of scrolling the content of the Keyboard Shortcuts Panel
       // which is needed when only a single month is shown for instance.
-      case 38: // ArrowUp
-      case 40: // ArrowDown
+      case keys.arrowUp:
+      case keys.arrowDown:
         e.stopPropagation();
         break;
 
       // Completely block the rest of the keys that have functionality outside of this panel
-      case 9: // Tab
-      case 13: // Enter
-      case 36: // Home
-      case 35: // End
-      case 33: // PageUp
-      case 34: // PageDown
-      case 37: // ArrowLeft
-      case 39: // ArrowRight
+      case keys.tab:
+      case keys.enter:
+      case keys.home:
+      case keys.end:
+      case keys.pageUp:
+      case keys.pageDown:
+      case keys.arrowLeft:
+      case keys.arrowRight:
         e.stopPropagation();
         e.preventDefault();
         break;

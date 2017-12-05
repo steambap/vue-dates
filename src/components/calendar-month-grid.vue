@@ -97,7 +97,7 @@ export default {
       type: Function,
       default: function() {}
     },
-    onMonthTransitionEnd: {
+    handleMonthTransitionEnd: {
       type: Function,
       default: function() {}
     },
@@ -259,10 +259,10 @@ export default {
     }, 0);
   },
   updated() {
-    // For IE9, immediately call onMonthTransitionEnd instead of
+    // For IE9, immediately call handleMonthTransitionEnd instead of
     // waiting for the animation to complete
     if (!this.isTransitionEndSupported && this.isAnimating) {
-      this.onMonthTransitionEnd();
+      this.handleMonthTransitionEnd();
     }
   },
   beforeDestroy() {
