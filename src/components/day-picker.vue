@@ -1,6 +1,17 @@
 <template>
-  <div role="application" class="DayPicker">
-
+  <div role="application"
+    class="DayPicker"
+    :class="dayPickerClass"
+    :style="dayPickerStyle"
+  >
+    <outside-click-handler :handle-outside-click="handleOutsideClick">
+      <div class="DayPicker_weekHeaders"
+        aria-hidden="true"
+        role="presentation"
+      >
+        <err :weekHeader="" />
+      </div>
+    </outside-click-handler>
   </div>
 </template>
 
@@ -14,16 +25,22 @@ import {
   keys
 } from "../constants";
 import { DayPickerPhrases } from "../phrases";
-import { isTouchSupported, getCalendarMonthWidth, isDayVisible, getActiveElement } from "../helpers";
+import {
+  isTouchSupported,
+  getCalendarMonthWidth,
+  isDayVisible,
+  getActiveElement
+} from "../helpers";
+import OutsideClickHandler from "./outside-click-handler";
 
 const MONTH_PADDING = 23;
 const DAY_PICKER_PADDING = 9;
-const PREV_TRANSITION = 'prev';
-const NEXT_TRANSITION = 'next';
+const PREV_TRANSITION = "prev";
+const NEXT_TRANSITION = "next";
 
 export default {
   name: "day-picker",
-  components: {},
+  components: {OutsideClickHandler},
   props: {
     enableOutsideDays: {
       type: Boolean,
@@ -165,21 +182,22 @@ export default {
   },
   data() {
     const currentMonth = this.hidden ? moment() : this.initialVisibleMonth();
-    let focusedDate = currentMonth.clone().startOf('month');
+    let focusedDate = currentMonth.clone().startOf("month");
     if (this.getFirstFocusableDay) {
       focusedDate = this.getFirstFocusableDay(currentMonth);
     }
 
-    const translationValue = this.isRTL && (this.orientation === HORIZONTAL_ORIENTATION)
-    ? -getCalendarMonthWidth(this.daySize)
-    : 0;
+    const translationValue =
+      this.isRTL && this.orientation === HORIZONTAL_ORIENTATION
+        ? -getCalendarMonthWidth(this.daySize)
+        : 0;
 
     return {
       currentMonth,
       monthTransition: null,
       translationValue,
       scrollabelMonthMultiple: 1,
-      focusedDate: (!this.hidden || this.isFocused) ? focusedDate : null,
+      focusedDate: !this.hidden || this.isFocused ? focusedDate : null,
       nextFocusDate: null,
       onKeyboardShortcutsPanelClose: function() {},
       isTouchSupported: isTouchSupported(),
@@ -198,6 +216,34 @@ export default {
     },
     isVertical() {
       return this.orientation === VERTICAL_ORIENTATION;
+    },
+    verticalScrollable() {
+      return this.orientation === VERTICAL_SCROLLABLE;
+    },
+    horizontalWidth() {
+      return (this.calendarMonthWidth * this.numberOfMonths) + (2 * DAY_PICKER_PADDING);
+    },
+    dayPickerClass() {
+      return {
+        DayPicker__horizontal: this.isHorizontal,
+        DayPicker__vertical: this.isVertical,
+        DayPicker__verticalScrollable: this.verticalScrollable,
+        DayPicker_portal__horizontal: this.isHorizontal && this.withPortal,
+        DayPicker_portal__vertical: this.isVertical && this.withPortal,
+        DayPicker__hidden: !this.hasSetHeight,
+        DayPicker__withBorder: !this.noBorder
+      };
+    },
+    dayPickerStyle() {
+      const width = this.isHorizontal ? this.horizontalWidth + 'px' : undefined;
+      const marginLeft = this.isHorizontal && this.withPortal
+        ? (-this.horizontalWidth / 2) + 'px' : undefined;
+      const marginTop = this.isHorizontal && this.withPortal
+        ? (-this.calendarMonthWidth / 2) + 'px' : undefined;
+
+      return {
+        width: width, marginLeft: marginLeft, marginTop: marginTop
+      };
     }
   },
   methods: {
@@ -205,7 +251,7 @@ export default {
       e.stopPropagation();
       this.withMouseInteractions = false;
 
-      const {focusedDate, handleBlur, isRTL, showKeyboardShortcuts} = this;
+      const { focusedDate, handleBlur, isRTL, showKeyboardShortcuts } = this;
       if (!focusedDate) {
         return;
       }
@@ -226,51 +272,51 @@ export default {
       switch (e.keyCode) {
         case keys.arrowUp:
           e.preventDefault();
-          newFocusedDate.subtract(1, 'week');
+          newFocusedDate.subtract(1, "week");
           didTransitionMonth = this.maybeTransitionPrevMonth(newFocusedDate);
           break;
         case keys.arrowLeft:
           e.preventDefault();
           if (isRTL) {
-            newFocusedDate.add(1, 'day');
+            newFocusedDate.add(1, "day");
           } else {
-            newFocusedDate.subtract(1, 'day');
+            newFocusedDate.subtract(1, "day");
           }
           didTransitionMonth = this.maybeTransitionPrevMonth(newFocusedDate);
           break;
         case keys.home:
           e.preventDefault();
-          newFocusedDate.startOf('week');
+          newFocusedDate.startOf("week");
           didTransitionMonth = this.maybeTransitionPrevMonth(newFocusedDate);
           break;
         case keys.pageUp:
           e.preventDefault();
-          newFocusedDate.subtract(1, 'month');
+          newFocusedDate.subtract(1, "month");
           didTransitionMonth = this.maybeTransitionPrevMonth(newFocusedDate);
           break;
 
         case keys.arrowDown:
           e.preventDefault();
-          newFocusedDate.add(1, 'week');
+          newFocusedDate.add(1, "week");
           didTransitionMonth = this.maybeTransitionNextMonth(newFocusedDate);
           break;
         case keys.arrowRight:
           e.preventDefault();
           if (isRTL) {
-            newFocusedDate.subtract(1, 'day');
+            newFocusedDate.subtract(1, "day");
           } else {
-            newFocusedDate.add(1, 'day');
+            newFocusedDate.add(1, "day");
           }
           didTransitionMonth = this.maybeTransitionNextMonth(newFocusedDate);
           break;
         case keys.end:
           e.preventDefault();
-          newFocusedDate.endOf('week');
+          newFocusedDate.endOf("week");
           didTransitionMonth = this.maybeTransitionNextMonth(newFocusedDate);
           break;
         case keys.pageDown:
           e.preventDefault();
-          newFocusedDate.add(1, 'month');
+          newFocusedDate.add(1, "month");
           didTransitionMonth = this.maybeTransitionNextMonth(newFocusedDate);
           break;
 
@@ -285,7 +331,7 @@ export default {
             handleBlur();
           }
           break;
-      
+
         default:
           break;
       }
@@ -304,14 +350,19 @@ export default {
         e.preventDefault();
       }
 
-      let translationValue = this.isVertical ? this.calendarMonthHeights[0] : calendarMonthWidth;
+      let translationValue = this.isVertical
+        ? this.calendarMonthHeights[0]
+        : calendarMonthWidth;
 
       if (this.isHorizontal) {
         if (isRTL) {
           translationValue = -2 * calendarMonthWidth;
         }
 
-        const newMonthHeight = Math.max(0, ...this.calendarMonthHeights.slice(0, numberOfMonths));
+        const newMonthHeight = Math.max(
+          0,
+          ...this.calendarMonthHeights.slice(0, numberOfMonths)
+        );
         this.adjustDayPickerHeight(newMonthHeight);
       }
 
@@ -320,22 +371,154 @@ export default {
       this.focusedDate = null;
       this.nextFocusedDate = nextFocusedDate;
     },
-    onNextMonthClick() {},
-    multiScrollableMonths() {},
-    updateDataAfterMonthTransition() {},
-    openKeyboardShortcutsPanel() {},
-    closeKeyboardShortcutsPanel() {},
-    setCalendarMonthHeights() {},
+    onNextMonthClick() {
+      const { numberOfMonths, isRTL, calendarMonthWidth } = this;
+
+      if (e) {
+        e.preventDefault();
+      }
+
+      let translationValue = this.isVertical
+        ? -this.calendarMonthHeights[1]
+        : -calendarMonthWidth;
+
+      if (this.isHorizontal) {
+        if (isRTL) {
+          translationValue = 0;
+        }
+
+        const newMonthHeight = Math.max(
+          0,
+          ...this.calendarMonthHeights.slice(2)
+        );
+        this.adjustDayPickerHeight(newMonthHeight);
+      }
+
+      this.monthTransition = NEXT_TRANSITION;
+      this.translationValue = translationValue;
+      this.focusedDate = null;
+      this.nextFocusedDate = nextFocusedDate;
+    },
+    getFirstVisibleIndex() {
+      const { orientation, monthTransition } = this;
+
+      if (orientation === VERTICAL_SCROLLABLE) {
+        return 0;
+      }
+
+      let firstVisibleMonthIndex = 1;
+      if (monthTransition === PREV_TRANSITION) {
+        firstVisibleMonthIndex -= 1;
+      } else if (monthTransition === NEXT_TRANSITION) {
+        firstVisibleMonthIndex += 1;
+      }
+
+      return firstVisibleMonthIndex;
+    },
+    multiScrollableMonths(e) {
+      const { handleMultiScrollableMonths } = this;
+      if (e) {
+        e.preventDefault();
+      }
+
+      if (handleMultiScrollableMonths) {
+        handleMultiScrollableMonths(e);
+      }
+
+      this.scrollabelMonthMultiple = this.scrollabelMonthMultiple + 1;
+    },
+    updateDataAfterMonthTransition() {
+      const {
+        handlePrevMonthClick,
+        handleNextMonthClick,
+        currentMonth,
+        monthTransition,
+        focusedDate,
+        nextFocusedDate,
+        withMouseInteractions,
+        calendarMonthWidth
+      } = this;
+
+      if (!monthTransition) {
+        return;
+      }
+
+      const newMonth = currentMonth.clone();
+      if (monthTransition === PREV_TRANSITION) {
+        if (handlePrevMonthClick) {
+          handlePrevMonthClick();
+        }
+        newMonth.subtract(1, "month");
+      } else if (monthTransition === NEXT_TRANSITION) {
+        if (handleNextMonthClick) {
+          handleNextMonthClick();
+        }
+        newMonth.add(1, "month");
+      }
+
+      let newFocusedDate = null;
+      if (nextFocusedDate) {
+        newFocusedDate = nextFocusedDate;
+      } else if (!focusedDate && !withMouseInteractions) {
+        newFocusedDate = this.getFocusedDay(newMonth);
+      }
+
+      this.currentMonth = newMonth;
+      this.monthTransition = null;
+      this.translationValue =
+        this.isRTL && this.isHorizontal ? -calendarMonthWidth : 0;
+      this.nextFocusedDate = null;
+      this.focusedDate = newFocusedDate;
+      // We don't want to focus on the relevant calendar day after a month transition
+      // if the user is navigating around using a mouse
+      this.$nextTick(() => {
+        if (withMouseInteractions) {
+          const activeElm = getActiveElement();
+          if (activeElm && activeElm !== document.body) {
+            activeElm.blur();
+          }
+        }
+      });
+    },
+    openKeyboardShortcutsPanel(onCloseCallback) {
+      this.showKeyboardShortcuts = true;
+      this.onKeyboardShortcutsPanelClose = onCloseCallback;
+    },
+    closeKeyboardShortcutsPanel() {
+      const { onKeyboardShortcutsPanelClose } = this;
+      if (onKeyboardShortcutsPanelClose) {
+        onKeyboardShortcutsPanelClose();
+      }
+
+      this.onKeyboardShortcutsPanelClose = null;
+      this.showKeyboardShortcuts = false;
+    },
+    setCalendarMonthHeights(calendarMonthHeights) {
+      const firstVisibleMonthIndex = this.getFirstVisibleIndex();
+      const lastVisibleMonthIndex =
+        firstVisibleMonthIndex + this.numberOfMonths;
+
+      this.calendarMonthHeights = calendarMonthHeights;
+      const visibleCalendarMonthHeights = calendarMonthHeights.filter(
+        (_, i) => i >= firstVisibleMonthIndex && i < lastVisibleMonthIndex
+      );
+      this.calendarMonthGridHeight =
+        Math.max(0, ...visibleCalendarMonthHeights) + MONTH_PADDING;
+      this.hasSetHeight = true;
+    },
     getFocusedDay(newMonth) {
-      const {getFirstFocusableDay, numberOfMonths} = this;
+      const { getFirstFocusableDay, numberOfMonths } = this;
 
       let focusedDate;
       if (getFirstFocusableDay) {
         focusedDate = getFirstFocusableDay(newMonth);
       }
 
-      if (newMonth && (!focusedDate || !isDayVisible(focusedDate, newMonth, numberOfMonths))) {
-        focusedDate = newMonth.clone().startOf('month');
+      if (
+        newMonth &&
+        (!focusedDate || !isDayVisible(focusedDate, newMonth, numberOfMonths))
+      ) {
+        focusedDate = newMonth.clone().startOf("month");
       }
 
       return focusedDate;
@@ -345,7 +528,11 @@ export default {
 
       const newFocusedMonth = newFocusedDate.month();
       const focusedDateMonth = focusedDate.month();
-      const isNewDateVisible = isDayVisible(newFocusedDate, currentMonth, numberOfMonths);
+      const isNewDateVisible = isDayVisible(
+        newFocusedDate,
+        currentMonth,
+        numberOfMonths
+      );
       if (newFocusedMonth !== focusedDateMonth && !isNewDateVisible) {
         this.onNextMonthClick(newFocusedDate);
 
@@ -359,7 +546,11 @@ export default {
 
       const newFocusedMonth = newFocusedDate.month();
       const focusedDateMonth = focusedDate.month();
-      const isNewDateVisible = isDayVisible(newFocusedDate, currentMonth, numberOfMonths);
+      const isNewDateVisible = isDayVisible(
+        newFocusedDate,
+        currentMonth,
+        numberOfMonths
+      );
       if (newFocusedMonth !== focusedDateMonth && !isNewDateVisible) {
         this.onPrevMonthClick(newFocusedDate);
 
@@ -406,7 +597,6 @@ export default {
             this.onKeyboardShortcutsPanelClose = this.handleBlur;
           }
           this.withMouseInteractions = false;
-
         } else {
           this.focusedDate = null;
         }
