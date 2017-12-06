@@ -11,8 +11,7 @@
 		<table class="CalendarMonth_table">
 			<tbody ref="dayGrid">
 				<tr v-for="(week, i) in weeks" :key="i">
-					<component v-for="(day, dayOfWeek) in week"
-            :is="day ? 'CalendarDay' : 'td'"
+					<CalendarDay v-for="(day, dayOfWeek) in week"
 						:key="dayOfWeek"
 						:day="day"
 						:day-size="daySize"
@@ -24,7 +23,7 @@
 						:handle-day-click="handleDayClick"
 						:render-day="renderDay"
 						:modifiers="modifiers[toISODateString(day)]"
-					></component>
+					></CalendarDay>
 				</tr>
 			</tbody>
 		</table>
@@ -45,7 +44,7 @@ import {
   toISODateString,
   calculateDimension
 } from "../helpers";
-import CalendarDay from "./calendar-day.vue";
+import CalendarDay from "./calendar-day";
 
 export default {
   name: "calendar-month",
