@@ -9,7 +9,100 @@
         aria-hidden="true"
         role="presentation"
       >
-        <err :weekHeader="" />
+        <div
+          v-for="w in weekHeaders"
+          :key="w.key"
+          class="DayPicker_weekHeader"
+          :class="{
+            'DayPicker_weekHeader__vertical': isVertical,
+            'DayPicker_weekHeader__verticalScrollable': verticalScrollable
+          }"
+          :style="w.style"
+        >
+          <ul class="DayPicker_weekHeader_ul">
+            <li
+              v-for="day in w"
+              :key="day.key"
+              class="DayPicker_weekHeader_li"
+              :style="{width: daySize + 'pc'}"
+            >
+              <small>{{day.title}}</small>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div
+        class="DayPicker_focusRegion"
+        ref="container"
+        @click.stop
+        @keydown="throttleKeyDown"
+        @mouseup="this.withMouseInteractions = true"
+        role="region"
+        tabindex="-1"
+      >
+        <day-picker-navigation
+          v-if="!verticalScrollable"
+          :handle-prev-month-click="navPrevMonthClick"
+          :handle-next-month-click="navNextMonthClick"
+          :orientation="orientation"
+          :is-r-t-l="isRTL"
+        ></day-picker-navigation>
+
+        <div
+          class="DayPicker_transitionContainer"
+          :class="{
+            'DayPicker_transitionContainer__horizontal': isHorizontalAndAnimating,
+            'DayPicker_transitionContainer__vertical': isVertical,
+            'DayPicker_transitionContainer__verticalScrollable': verticalScrollable
+          }"
+          :style="transitionContainerStyle"
+          ref="transitionContainer"
+        >
+          <calendar-month-grid
+            :set-calendar-month-heights="setCalendarMonthHeights"
+            :transform-value="transformStyle"
+            :enable-outside-days="enableOutsideDays"
+            :first-visible-month-index="getFirstVisibleIndex()"
+            :initial-month="currentMonth"
+            :is-animating="isCalendarMonthGridAnimating"
+            :modifiers="modifiers"
+            :orientation="orientation"
+            :number-of-months="numberOfMonths * scrollabelMonthMultiple"
+            :handle-day-click="handleDayClick"
+            :handle-day-mouse-enter="handleDayMouseEnter"
+            :handle-day-mouse-leave="handleDayMouseLeave"
+            :render-month="renderMonth"
+            :render-day="renderDay"
+            :handle-month-transition-end="updateStateAfterMonthTransition"
+            :month-format="monthFormat"
+            :day-size="daySize"
+            :first-day-of-week="firstDayOfWeek"
+            :is-focused="!isCalendarMonthGridAnimating && isFocused"
+            :focused-date="focusedDate"
+            :is-r-t-l="isRTL"
+            :transition-duration="transitionDuration"
+          >
+          </calendar-month-grid>
+          <day-picker-navigation
+            v-if="verticalScrollable"
+            :handle-prev-month-click="navPrevMonthClick"
+            :handle-next-month-click="navNextMonthClick"
+            :orientation="orientation"
+            :is-r-t-l="isRTL"
+          ></day-picker-navigation>
+        </div>
+
+        <day-picker-keyboard-shortcuts
+          v-if="!isTouchSupported && !hideKeyboardShortcutsPanel"
+          :block="isVertical && !withPortal"
+          :button-location="buttonLocation"
+          :show-keyboard-shortcuts-panel="showKeyboardShortcuts"
+          :open-keyboard-shortcuts-panel="openKeyboardShortcutsPanel"
+          :close-keyboard-shortcuts-panel="closeKeyboardShortcutsPanel"
+          :phrases="phrases"
+        >
+        </day-picker-keyboard-shortcuts>
       </div>
     </outside-click-handler>
   </div>
@@ -17,6 +110,7 @@
 
 <script>
 import moment from "moment";
+import throttle from "lodash/throttle";
 import {
   HORIZONTAL_ORIENTATION,
   VERTICAL_ORIENTATION,
@@ -32,6 +126,13 @@ import {
   getActiveElement
 } from "../helpers";
 import OutsideClickHandler from "./outside-click-handler";
+import DayPickerNavigation from "./day-picker-navigation.vue";
+import CalendarMonthGrid from "./calendar-month-grid.vue";
+import DayPickerKeyboardShortcuts, {
+  TOP_LEFT,
+  TOP_RIGHT,
+  BOTTOM_RIGHT
+} from "./day-picker-keyboard-shortcuts.vue";
 
 const MONTH_PADDING = 23;
 const DAY_PICKER_PADDING = 9;
@@ -40,7 +141,12 @@ const NEXT_TRANSITION = "next";
 
 export default {
   name: "day-picker",
-  components: {OutsideClickHandler},
+  components: {
+    OutsideClickHandler,
+    DayPickerNavigation,
+    CalendarMonthGrid,
+    DayPickerKeyboardShortcuts
+  },
   props: {
     enableOutsideDays: {
       type: Boolean,
@@ -75,10 +181,6 @@ export default {
     firstDayOfWeek: {
       type: Number,
       default: moment.localeData().firstDayOfWeek()
-    },
-    renderCalendarInfo: {
-      type: Function,
-      default: null
     },
     hideKeyboardShortcutsPanel: {
       type: Boolean,
@@ -221,7 +323,9 @@ export default {
       return this.orientation === VERTICAL_SCROLLABLE;
     },
     horizontalWidth() {
-      return (this.calendarMonthWidth * this.numberOfMonths) + (2 * DAY_PICKER_PADDING);
+      return (
+        this.calendarMonthWidth * this.numberOfMonths + 2 * DAY_PICKER_PADDING
+      );
     },
     dayPickerClass() {
       return {
@@ -235,18 +339,102 @@ export default {
       };
     },
     dayPickerStyle() {
-      const width = this.isHorizontal ? this.horizontalWidth + 'px' : undefined;
-      const marginLeft = this.isHorizontal && this.withPortal
-        ? (-this.horizontalWidth / 2) + 'px' : undefined;
-      const marginTop = this.isHorizontal && this.withPortal
-        ? (-this.calendarMonthWidth / 2) + 'px' : undefined;
+      const width = this.isHorizontal ? this.horizontalWidth + "px" : undefined;
+      const marginLeft =
+        this.isHorizontal && this.withPortal
+          ? -this.horizontalWidth / 2 + "px"
+          : undefined;
+      const marginTop =
+        this.isHorizontal && this.withPortal
+          ? -this.calendarMonthWidth / 2 + "px"
+          : undefined;
 
       return {
-        width: width, marginLeft: marginLeft, marginTop: marginTop
+        width: width,
+        marginLeft: marginLeft,
+        marginTop: marginTop
       };
+    },
+    weekHeaders() {
+      const { weekDayFormat, calendarMonthWidth, firstDayOfWeek } = this;
+
+      const numOfWeekHeaders = this.isVertical ? 1 : this.numberOfMonths;
+      const weekHeaders = [];
+      for (let i = 0; i < numOfWeekHeaders; i += 1) {
+        const horizontalStyle = {
+          left: index * calendarMonthWidth
+        };
+        const verticalStyle = {
+          marginLeft: -calendarMonthWidth / 2 + "px"
+        };
+
+        let weekHeaderStyle = {};
+        if (this.isHorizontal) {
+          weekHeaderStyle = horizontalStyle;
+        } else if (this.isVertical && !this.verticalScrollable) {
+          weekHeaderStyle = verticalStyle;
+        }
+
+        const dayHeader = [];
+        for (let j = 0; j < 7; j++) {
+          dayHeader.push({
+            key: j,
+            title: moment()
+              .day((j + firstDayOfWeek) % 7)
+              .format(weekDayFormat)
+          });
+        }
+
+        weekHeaders.push({
+          key: "week-" + i,
+          header: dayHeader,
+          style: weekHeaderStyle
+        });
+      }
+
+      return weekHeaders;
+    },
+    isCalendarMonthGridAnimating() {
+      return this.monthTransition !== null;
+    },
+    isHorizontalAndAnimating() {
+      return this.isHorizontal && this.isCalendarMonthGridAnimating;
+    },
+    transitionContainerStyle() {
+      let height;
+      if (this.isHorizontal) {
+        height = this.calendarMonthGridHeight + "px";
+      } else if (
+        this.isVertical &&
+        !this.verticalScrollable &&
+        !this.withPortal
+      ) {
+        height = (this.verticalHeight || 1.75 * this.calendarMonthWidth) + "px";
+      }
+
+      let width;
+      if (this.isHorizontal) {
+        width = this.horizontalWidth + "px";
+      }
+
+      return { width, height };
+    },
+    transformStyle() {
+      const transformType = this.isVertical ? "translateY" : "translateX";
+
+      return `${transformType}(${this.translationValue}px)`;
+    },
+    buttonLocation() {
+      let loc = BOTTOM_RIGHT;
+      if (this.isVertical) {
+        loc = this.withPortal ? TOP_LEFT : TOP_RIGHT;
+      }
+
+      return loc;
     }
   },
   methods: {
+    throttleKeyDown: throttle(this.onKeyDown.bind(this), 300),
     onKeyDown(e) {
       e.stopPropagation();
       this.withMouseInteractions = false;
@@ -343,6 +531,9 @@ export default {
         this.focusedDate = newFocusedDate;
       }
     },
+    navPrevMonthClick(e) {
+      return this.onPrevMonthClick(null, e);
+    },
     onPrevMonthClick(nextFocusedDate, e) {
       const { numberOfMonths, isRTL, calendarMonthWidth } = this;
 
@@ -371,7 +562,14 @@ export default {
       this.focusedDate = null;
       this.nextFocusedDate = nextFocusedDate;
     },
-    onNextMonthClick() {
+    navNextMonthClick(e) {
+      if (this.orientation === VERTICAL_SCROLLABLE) {
+        this.multiScrollableMonths();
+      } else {
+        this.onNextMonthClick(null, e);
+      }
+    },
+    onNextMonthClick(nextFocusedDate, e) {
       const { numberOfMonths, isRTL, calendarMonthWidth } = this;
 
       if (e) {
