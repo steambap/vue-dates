@@ -22,6 +22,10 @@ export const DAY_SIZE = 39;
 export const BLOCKED_MODIFIER = "blocked";
 export const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6];
 
+export const TOP_LEFT = "top-left";
+export const TOP_RIGHT = "top-right";
+export const BOTTOM_RIGHT = "bottom-right";
+
 export const keys = {
   space: 32,
   esc: 27,

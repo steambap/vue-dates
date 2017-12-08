@@ -37,7 +37,7 @@
         ref="container"
         @click.stop
         @keydown="throttleKeyDown"
-        @mouseup="this.withMouseInteractions = true"
+        @mouseup="withMouseInteractions = true"
         role="region"
         tabindex="-1"
       >
@@ -74,7 +74,7 @@
             :handle-day-mouse-leave="handleDayMouseLeave"
             :render-month="renderMonth"
             :render-day="renderDay"
-            :handle-month-transition-end="updateStateAfterMonthTransition"
+            :handle-month-transition-end="updateDataAfterMonthTransition"
             :month-format="monthFormat"
             :day-size="daySize"
             :first-day-of-week="firstDayOfWeek"
@@ -116,7 +116,10 @@ import {
   VERTICAL_ORIENTATION,
   VERTICAL_SCROLLABLE,
   DAY_SIZE,
-  keys
+  keys,
+  TOP_LEFT,
+  TOP_RIGHT,
+  BOTTOM_RIGHT
 } from "../constants";
 import { DayPickerPhrases } from "../phrases";
 import {
@@ -128,11 +131,7 @@ import {
 import OutsideClickHandler from "./outside-click-handler";
 import DayPickerNavigation from "./day-picker-navigation.vue";
 import CalendarMonthGrid from "./calendar-month-grid.vue";
-import DayPickerKeyboardShortcuts, {
-  TOP_LEFT,
-  TOP_RIGHT,
-  BOTTOM_RIGHT
-} from "./day-picker-keyboard-shortcuts.vue";
+import DayPickerKeyboardShortcuts from "./day-picker-keyboard-shortcuts.vue";
 
 const MONTH_PADDING = 23;
 const DAY_PICKER_PADDING = 9;
@@ -262,7 +261,7 @@ export default {
       type: Function,
       default: function() {}
     },
-    showKeyboardShortcuts: {
+    showKeyboardShortcutsOnInit: {
       type: Boolean,
       default: false
     },
@@ -301,6 +300,7 @@ export default {
       scrollabelMonthMultiple: 1,
       focusedDate: !this.hidden || this.isFocused ? focusedDate : null,
       nextFocusDate: null,
+      showKeyboardShortcuts: this.showKeyboardShortcutsOnInit,
       onKeyboardShortcutsPanelClose: function() {},
       isTouchSupported: isTouchSupported(),
       withMouseInteractions: true,
@@ -362,7 +362,7 @@ export default {
       const weekHeaders = [];
       for (let i = 0; i < numOfWeekHeaders; i += 1) {
         const horizontalStyle = {
-          left: index * calendarMonthWidth
+          left: i * calendarMonthWidth
         };
         const verticalStyle = {
           marginLeft: -calendarMonthWidth / 2 + "px"
@@ -434,7 +434,9 @@ export default {
     }
   },
   methods: {
-    throttleKeyDown: throttle(this.onKeyDown.bind(this), 300),
+    throttleKeyDown: throttle(function(e) {
+      this.onKeyDown(e);
+    }, 300),
     onKeyDown(e) {
       e.stopPropagation();
       this.withMouseInteractions = false;
@@ -526,7 +528,7 @@ export default {
 
       // If there was a month transition, do not update the focused date until the transition has
       // completed. Otherwise, attempting to focus on a DOM node may interrupt the CSS animation. If
-      // didTransitionMonth is true, the focusedDate gets updated in #updateStateAfterMonthTransition
+      // didTransitionMonth is true, the focusedDate gets updated in #updateDataAfterMonthTransition
       if (!didTransitionMonth) {
         this.focusedDate = newFocusedDate;
       }
@@ -761,7 +763,7 @@ export default {
       const monthHeight = newMonthHeight + MONTH_PADDING;
       if (monthHeight !== this.calendarMonthGridHeight) {
         this.calendarMonthGridHeight = monthHeight;
-        this.$ref.container.style.height = `${monthHeight}px`;
+        this.$refs.container.style.height = `${monthHeight}px`;
       }
     }
   },
@@ -774,7 +776,7 @@ export default {
   },
   updated() {
     if (this.isFocused && !this.focusedDate) {
-      this.$ref.container.focus();
+      this.$refs.container.focus();
     }
   },
   watch: {

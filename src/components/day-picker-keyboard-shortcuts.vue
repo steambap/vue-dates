@@ -63,11 +63,7 @@
 import { DayPickerKeyboardShortcutsPhrases } from "../phrases";
 import { XIcon } from "vue-feather-icons";
 import KeyboardShortcutRow from "./keyboard-shortcut-row.vue";
-import { keys } from "../constants";
-
-export const TOP_LEFT = "top-left";
-export const TOP_RIGHT = "top-right";
-export const BOTTOM_RIGHT = "bottom-right";
+import { keys, TOP_LEFT, TOP_RIGHT, BOTTOM_RIGHT } from "../constants";
 
 export default {
   name: "day-picker-keyboard-shortcuts",
@@ -120,15 +116,15 @@ export default {
 
       // We want to return focus to this button after closing the keyboard shortcuts panel
       openKeyboardShortcutsPanel(() => {
-        this.$ref.showKeyboardShortcutsButton.focus();
+        this.$refs.showKeyboardShortcutsButton.focus();
       });
     },
     blur(e) {
       e.currentTarget.blur();
     },
     handleFocus() {
-      if (this.$ref.hideKeyboardShortcutsButton) {
-        this.$ref.hideKeyboardShortcutsButton.focus();
+      if (this.$refs.hideKeyboardShortcutsButton) {
+        this.$refs.hideKeyboardShortcutsButton.focus();
       }
     }
   },

@@ -1,7 +1,8 @@
-import { configure } from 'storybook-vue';
+import { configure } from "storybook-vue";
 
 function loadStories() {
-  require('../src/stories');
+  require("../src/stories/internal");
+  require("../src/stories/day-picker");
 }
 
-configure(loadStories, module)
+configure(loadStories, module);
