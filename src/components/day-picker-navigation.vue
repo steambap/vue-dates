@@ -185,6 +185,8 @@ export default {
 }
 .DayPickerNavigation_button__vertical {
   display: inline-block;
+  /* The inline block space problem */
+  margin-right: -4px;
   position: relative;
   height: 100%;
   width: 50%;

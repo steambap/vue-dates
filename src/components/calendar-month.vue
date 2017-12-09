@@ -121,15 +121,6 @@ export default {
       default: "MMMM YYYY"
     }
   },
-  data() {
-    return {
-      weeks: getCalendarMonthWeeks(
-        this.month,
-        this.enableOutsideDays,
-        this.firstDayOfWeek
-      )
-    };
-  },
   computed: {
     verticalScrollable() {
       return this.orientation === VERTICAL_SCROLLABLE;
@@ -145,6 +136,13 @@ export default {
       return this.renderMonth
         ? this.renderMonth(this.month)
         : this.month.format(this.monthFormat);
+    },
+    weeks() {
+      return getCalendarMonthWeeks(
+        this.month,
+        this.enableOutsideDays,
+        this.firstDayOfWeek
+      );
     }
   },
   methods: {
@@ -163,19 +161,10 @@ export default {
       setMonthHeightCb(captionHeight + gridHeight + 1);
     }
   },
-  beforeCreate() {
-    // Timer is not reactive
-    this.setMonthHeightTimer = 0;
-  },
   mounted() {
-    this.setMonthHeightTimer = setTimeout(() => {
+    this.$nextTick(() => {
       this.setMonthHeight();
-    }, 0);
-  },
-  beforeDestroy() {
-    if (this.setMonthHeightTimer) {
-      clearTimeout(this.setMonthHeightTimer);
-    }
+    });
   }
 };
 </script>

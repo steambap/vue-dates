@@ -6,7 +6,7 @@
 	>
 		<div
 			v-for="month in monthList"
-			:key="month.key"
+			:key="month.monthString"
 			:class="month.cssClass"
 			:style="month.styles"
 		>
@@ -26,7 +26,7 @@
 				:day-size="daySize"
 				:focused-date="month.isVisible ? focusedDate : null"
 				:is-focused="isFocused"
-				:set-month-height="month.setMonthHeight"
+				:set-month-height-cb="month.setMonthHeight"
 			></calendar-month>
 		</div>
 	</div>
@@ -217,7 +217,6 @@ export default {
           cssClass,
           styles,
           setMonthHeight,
-          key: i,
           data: month
         };
       });
@@ -239,24 +238,25 @@ export default {
       } else {
         this.calendarMonthHeights[idx] = height;
       }
+    },
+    onTransitionEnd() {
+      this.handleMonthTransitionEnd();
     }
   },
   beforeCreate() {
     // Non-reactive members
     this.calendarMonthHeights = [];
     this.locale = moment.locale();
-    this.setCalendarMonthHeightsTimer = 0;
   },
   mounted() {
-    const { setCalendarMonthHeights } = this;
     this.$refs.container.addEventListener(
       "transitionend",
       this.onTransitionEnd
     );
 
-    this.setCalendarMonthHeightsTimer = setTimeout(() => {
+    this.$nextTick(() => {
       this.setCalendarMonthHeights(this.calendarMonthHeights);
-    }, 0);
+    });
   },
   updated() {
     // For IE9, immediately call handleMonthTransitionEnd instead of
@@ -270,16 +270,13 @@ export default {
       "transitionend",
       this.onTransitionEnd
     );
-    if (this.setCalendarMonthHeightsTimer) {
-      clearTimeout(this.setCalendarMonthHeightsTimer);
-    }
   },
   watch: {
     isAnimating: function(oldVal, newVal) {
       if (!newVal && oldVal) {
-        this.setCalendarMonthHeightsTimer = setTimeout(() => {
+        this.$nextTick(() => {
           this.setCalendarMonthHeights(this.calendarMonthHeights);
-        }, 0);
+        });
       }
     }
   }
@@ -289,7 +286,7 @@ export default {
 <style>
 .CalendarMonthGrid {
   background: #fff;
-  text-align: center;
+  text-align: left;
   z-index: 0;
 }
 .CalendarMonthGrid__animating {

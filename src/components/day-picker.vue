@@ -6,6 +6,7 @@
   >
     <outside-click-handler :handle-outside-click="handleOutsideClick">
       <div class="DayPicker_weekHeaders"
+        :class="{DayPicker_weekHeaders__horizontal: isHorizontal}"
         aria-hidden="true"
         role="presentation"
       >
@@ -21,10 +22,10 @@
         >
           <ul class="DayPicker_weekHeader_ul">
             <li
-              v-for="day in w"
+              v-for="day in w.header"
               :key="day.key"
               class="DayPicker_weekHeader_li"
-              :style="{width: daySize + 'pc'}"
+              :style="{width: daySize + 'px'}"
             >
               <small>{{day.title}}</small>
             </li>
@@ -306,7 +307,8 @@ export default {
       withMouseInteractions: true,
       hasSetHeight: false,
       // Additional data that is not in react-dates
-      hasSetInitialVisibleMonth: !this.hidden
+      hasSetInitialVisibleMonth: !this.hidden,
+      calendarMonthGridHeight: 0
     };
   },
   computed: {
@@ -317,7 +319,10 @@ export default {
       return this.orientation === HORIZONTAL_ORIENTATION;
     },
     isVertical() {
-      return this.orientation === VERTICAL_ORIENTATION;
+      return (
+        this.orientation === VERTICAL_ORIENTATION ||
+        this.orientation === VERTICAL_SCROLLABLE
+      );
     },
     verticalScrollable() {
       return this.orientation === VERTICAL_SCROLLABLE;
@@ -362,7 +367,7 @@ export default {
       const weekHeaders = [];
       for (let i = 0; i < numOfWeekHeaders; i += 1) {
         const horizontalStyle = {
-          left: i * calendarMonthWidth
+          left: i * calendarMonthWidth + "px"
         };
         const verticalStyle = {
           marginLeft: -calendarMonthWidth / 2 + "px"
@@ -761,15 +766,11 @@ export default {
     },
     adjustDayPickerHeight(newMonthHeight) {
       const monthHeight = newMonthHeight + MONTH_PADDING;
-      if (monthHeight !== this.calendarMonthGridHeight) {
-        this.calendarMonthGridHeight = monthHeight;
-        this.$refs.container.style.height = `${monthHeight}px`;
-      }
+      this.calendarMonthGridHeight = monthHeight;
     }
   },
   beforeCreate() {
     this.calendarMonthHeights = [];
-    this.calendarMonthGridHeight = 0;
   },
   mounted() {
     this.isTouchSupported = isTouchSupported();
