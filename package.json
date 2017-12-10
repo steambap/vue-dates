@@ -8,11 +8,17 @@
     "build": "rollup -c rollup.config.js"
   },
   "repository": {
-    "type": "git"
+    "type": "git",
+    "url": "https://github.com/steambap/vue-dates"
   },
   "keywords": [
     "vue",
     "datepicker"
+  ],
+  "main": "index.js",
+  "files": [
+    "dist/*",
+    "*.md"
   ],
   "author": {
     "name": "Weilin Shi",
@@ -20,6 +26,9 @@
     "url": "http://weilinshi.org"
   },
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/steambap/vue-dates/issues"
+  },
   "homepage": "http://weilinshi.org/vue-dates/",
   "devDependencies": {
     "@storybook/addon-actions": "^3.2.16",
