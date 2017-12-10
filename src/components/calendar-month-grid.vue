@@ -269,10 +269,7 @@ export default {
     // waiting for the animation to complete. Similaryly, if transitionDuration
     // is set to 0, also immediately invoke the handleMonthTransitionEnd callback
     if ((!this.isTransitionEndSupported || !this.transitionDuration) && this.isAnimating) {
-      // Invoke callback on the next tick since the parent may not updated yet.
-      this.$nextTick(() => {
-        this.handleMonthTransitionEnd();
-      });
+      this.$nextTick(() => this.handleMonthTransitionEnd());
     }
   },
   beforeDestroy() {
@@ -282,8 +279,8 @@ export default {
     );
   },
   watch: {
-    isAnimating: function(oldVal, newVal) {
-      if (!newVal && oldVal) {
+    isAnimating: function(newVal, oldVal) {
+      if (newVal && !oldVal) {
         this.$nextTick(() => {
           this.setCalendarMonthHeights(this.calendarMonthHeights);
         });

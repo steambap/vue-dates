@@ -151,7 +151,7 @@ export default {
     }
   },
   watch: {
-    tabIndex: function(oldVal, newVal) {
+    tabIndex: function(newVal, oldVal) {
       if (newVal === 0) {
         if (this.isFocused || newVal !== oldVal) {
           this.$refs.button.focus();

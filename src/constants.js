@@ -39,5 +39,5 @@ export const keys = {
   pageDown: 34,
   arrowLeft: 37,
   arrowRight: 39,
-  question: 63
+  question: 191
 };

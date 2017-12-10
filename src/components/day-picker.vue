@@ -783,7 +783,7 @@ export default {
     }
   },
   watch: {
-    hidden(oldVal, newVal) {
+    hidden(newVal) {
       if (!newVal) {
         if (!this.hasSetInitialVisibleMonth) {
           this.hasSetInitialVisibleMonth = true;
@@ -791,7 +791,7 @@ export default {
         }
       }
     },
-    isFocused(oldVal, newVal) {
+    isFocused(newVal, oldVal) {
       if (oldVal !== newVal) {
         if (newVal) {
           this.focusedDate = this.getFocusedDay(this.currentMonth);
