@@ -105,6 +105,8 @@
         >
         </day-picker-keyboard-shortcuts>
       </div>
+
+      <slot name="info-panel"></slot>
     </outside-click-handler>
   </div>
 </template>

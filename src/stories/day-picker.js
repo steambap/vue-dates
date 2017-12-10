@@ -68,6 +68,24 @@ storiesOf("DayPicker", module)
       );
     }
   }))
+  .add("with info panel", () => ({
+    render() {
+      return (
+        <DayPicker>
+          <div
+            style={{
+              padding: "10px 21px",
+              borderTop: "1px solid #dce0e0",
+              color: "#484848"
+            }}
+            slot="info-panel"
+          >
+            &#x2755; Some useful info here
+          </div>
+        </DayPicker>
+      );
+    }
+  }))
   .add("with custome week day format", () => ({
     render() {
       return <DayPicker weekDayFormat="ddd" />;
