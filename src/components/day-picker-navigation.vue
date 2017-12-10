@@ -115,11 +115,13 @@ export default {
         };
       }
 
-      return {
-        DayPickerNavigation_nextButton__verticalScrollable: this
-          .isVerticalScrollable,
-        ...baseClass
-      };
+      return Object.assign(
+        {
+          DayPickerNavigation_nextButton__verticalScrollable: this
+            .isVerticalScrollable
+        },
+        baseClass
+      );
     },
     svgIconClass() {
       return {

@@ -173,13 +173,18 @@ export default {
       };
     },
     monthGridStyles() {
-      const {transitionDuration, isAnimating} = this;
-      return {
-        transition: isAnimating && transitionDuration
-        ? `transform ${transitionDuration}ms ease-in-out` : "none",
-        width: this.gridWidth + "px",
-        ...getTransformStyles(this.transformValue)
-      };
+      const { transitionDuration, isAnimating } = this;
+
+      return Object.assign(
+        {
+          transition:
+            isAnimating && transitionDuration
+              ? `transform ${transitionDuration}ms ease-in-out`
+              : "none",
+          width: this.gridWidth + "px"
+        },
+        getTransformStyles(this.transformValue)
+      );
     },
     monthList() {
       const withoutTransitionMonths = this.orientation === VERTICAL_SCROLLABLE;
@@ -268,7 +273,10 @@ export default {
     // For IE9, immediately call handleMonthTransitionEnd instead of
     // waiting for the animation to complete. Similaryly, if transitionDuration
     // is set to 0, also immediately invoke the handleMonthTransitionEnd callback
-    if ((!this.isTransitionEndSupported || !this.transitionDuration) && this.isAnimating) {
+    if (
+      (!this.isTransitionEndSupported || !this.transitionDuration) &&
+      this.isAnimating
+    ) {
       this.$nextTick(() => this.handleMonthTransitionEnd());
     }
   },

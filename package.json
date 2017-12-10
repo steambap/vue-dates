@@ -4,7 +4,8 @@
   "description": "Yet another datepicker for vue.js",
   "scripts": {
     "storybook": "poi --config .storybook/poi.config.js --storybook",
-    "storybook:build": "poi build --config .storybook/poi.config.js --storybook"
+    "storybook:build": "poi build --config .storybook/poi.config.js --storybook",
+    "build": "rollup -c rollup.config.js src/components/day-picker.vue --output.format cjs --output.file dist/day-picker.js"
   },
   "keywords": [
     "vue",
@@ -18,13 +19,18 @@
   "license": "MIT",
   "devDependencies": {
     "@storybook/addon-actions": "^3.2.16",
-    "moment": "^2.19.2",
+    "moment": "^2.19.3",
     "poi": "^9.5.4",
     "poi-preset-storybook": "^0.1.0",
-    "storybook-vue": "^3.2.15",
-    "vue-feather-icons": "^0.1.1"
+    "rollup": "^0.52.1",
+    "rollup-plugin-vue": "^3.0.0",
+    "storybook-vue": "^3.2.15"
   },
   "dependencies": {
-    "lodash": "^4.17.4"
+    "lodash": "^4.17.4",
+    "vue-feather-icons": "^0.1.1"
+  },
+  "peerDependencies": {
+    "moment": "^2.19.3"
   }
 }
