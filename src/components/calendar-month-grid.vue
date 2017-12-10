@@ -137,6 +137,10 @@ export default {
       type: Boolean,
       default: false
     },
+    transitionDuration: {
+      type: Number,
+      default: 200
+    },
     monthFormat: {
       type: String,
       default: "MMMM YYYY"
@@ -169,8 +173,10 @@ export default {
       };
     },
     monthGridStyles() {
+      const {transitionDuration, isAnimating} = this;
       return {
-        transition: this.isAnimating ? "transform 0.2s ease-in-out" : "none",
+        transition: isAnimating && transitionDuration
+        ? `transform ${transitionDuration}ms ease-in-out` : "none",
         width: this.gridWidth + "px",
         ...getTransformStyles(this.transformValue)
       };
@@ -260,9 +266,13 @@ export default {
   },
   updated() {
     // For IE9, immediately call handleMonthTransitionEnd instead of
-    // waiting for the animation to complete
-    if (!this.isTransitionEndSupported && this.isAnimating) {
-      this.handleMonthTransitionEnd();
+    // waiting for the animation to complete. Similaryly, if transitionDuration
+    // is set to 0, also immediately invoke the handleMonthTransitionEnd callback
+    if ((!this.isTransitionEndSupported || !this.transitionDuration) && this.isAnimating) {
+      // Invoke callback on the next tick since the parent may not updated yet.
+      this.$nextTick(() => {
+        this.handleMonthTransitionEnd();
+      });
     }
   },
   beforeDestroy() {

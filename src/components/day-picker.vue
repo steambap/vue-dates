@@ -815,14 +815,16 @@ export default {
 }
 .DayPicker__horizontal {
   background: #fff;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.07);
-  border-radius: 3px;
 }
 .DayPicker__verticalScrollable {
   height: 100%;
 }
 .DayPicker__hidden {
   visibility: hidden;
+}
+.DayPicker__withBorder {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.07);
+  border-radius: 3px;
 }
 .DayPicker_portal__horizontal {
   box-shadow: none;

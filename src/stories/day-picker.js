@@ -37,4 +37,49 @@ storiesOf("DayPicker", module)
         </div>
       );
     }
+  }))
+  .add("vertical with custom day size", () => ({
+    render() {
+      return <DayPicker orientation={VERTICAL_ORIENTATION} daySize={50} />;
+    }
+  }))
+  .add("vertical with custom height", () => ({
+    render() {
+      return (
+        <DayPicker orientation={VERTICAL_ORIENTATION} verticalHeight={568} />
+      );
+    }
+  }))
+  .add("with custom details", () => ({
+    render() {
+      return (
+        <DayPicker
+          renderDay={day => (day.day() % 6 === 5 ? "😻" : day.format("D"))}
+        />
+      );
+    }
+  }))
+  .add("vertical with fixed-width container", () => ({
+    render() {
+      return (
+        <div style={{ width: "400px" }}>
+          <DayPicker orientation={VERTICAL_ORIENTATION} />
+        </div>
+      );
+    }
+  }))
+  .add("with custome week day format", () => ({
+    render() {
+      return <DayPicker weekDayFormat="ddd" />;
+    }
+  }))
+  .add("with no animation", () => ({
+    render() {
+      return <DayPicker transitionDuration={0} />;
+    }
+  }))
+  .add("noBorder", () => ({
+    render() {
+      return <DayPicker noBorder />;
+    }
   }));
