@@ -5,7 +5,10 @@
   "scripts": {
     "storybook": "poi --config .storybook/poi.config.js --storybook",
     "storybook:build": "poi build --config .storybook/poi.config.js --storybook",
-    "build": "rollup -c rollup.config.js src/components/day-picker.vue --output.format cjs --output.file dist/day-picker.js"
+    "build": "rollup -c rollup.config.js"
+  },
+  "repository": {
+    "type": "git"
   },
   "keywords": [
     "vue",
@@ -17,6 +20,7 @@
     "url": "http://weilinshi.org"
   },
   "license": "MIT",
+  "homepage": "http://weilinshi.org/vue-dates/",
   "devDependencies": {
     "@storybook/addon-actions": "^3.2.16",
     "moment": "^2.19.3",
