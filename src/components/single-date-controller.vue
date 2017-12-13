@@ -1,6 +1,41 @@
+<template>
+  <day-picker
+    :orientation="orientation"
+    :enable-outside-days="enableOutsideDays"
+    :modifiers="visibleDays"
+    :number-of-months="numberOfMonths"
+    :handle-day-click="onDayClick"
+    :handle-day-mouse-enter="onDayMouseEnter"
+    :handle-day-mouse-leave="onDayMouseLeave"
+    :handle-prev-month-click="onPrevMonthClick"
+    :handle-next-month-click="onNextMonthClick"
+    :month-format="monthFormat"
+    :with-portal="withPortal"
+    :hidden="!focused"
+    :hide-keyboard-shortcuts-panel="hideKeyboardShortcutsPanel"
+    :initial-visible-month="getCurrentMonth"
+    :first-day-of-week="firstDayOfWeek"
+    :render-month="renderMonth"
+    :render-day="renderDay"
+    :is-focused="isFocused"
+    :get-first-focusable-day="getFirstFocusableDay"
+    :handle-blur="handleBlur"
+    :phrases="phrases"
+    :day-size="daySize"
+    :is-r-t-l="isRTL"
+    :show-keyboard-shortcuts-on-init="showKeyboardShortcutsOnInit"
+    :week-day-format="weekDayFormat"
+    :vertical-height="verticalHeight"
+    :no-border="noBorder"
+    :transition-duration="transitionDuration"
+  >
+    <slot name="info-panel"></slot>
+  </day-picker>
+</template>
+
+<script>
 import moment from "moment";
 
-import OutsideClickHandler from "./outside-click-handler";
 import DayPicker from "./day-picker.vue";
 import { DAY_SIZE, HORIZONTAL_ORIENTATION } from "../constants";
 import { DayPickerPhrases } from "../phrases";
@@ -9,11 +44,15 @@ import {
   isSameDay,
   getVisibleDays,
   isAfterDay,
-  toISODateString
+  toISODateString,
+  toISOMonthString,
+  unique,
+  isDayVisible
 } from "../helpers";
 
 export default {
   name: "single-date-controller",
+  components: { DayPicker },
   props: {
     date: {
       type: moment,
@@ -108,10 +147,6 @@ export default {
       type: Function,
       default: function() {}
     },
-    handleOutsideClick: {
-      type: Function,
-      default: function() {}
-    },
     renderDay: {
       type: Function,
       default: null
@@ -150,26 +185,70 @@ export default {
     }
   },
   data() {
-    this.modifiers = {
-      today: day => this.isToday(day),
-      blocked: day => this.isBlocked(day),
-      "blocked-calendar": day => this.isDayBlocked(day),
-      "blocked-out-of-range": day => this.isOutsideRange(day),
-      "highlighted-calendar": day => this.isDayHighlighted(day),
-      valid: day => !this.isBlocked(day),
-      hovered: day => this.isHovered(day),
-      selected: day => this.isSelected(day)
-    };
+    const today = moment();
+    let currentMonth = today;
+    if (this.date) {
+      currentMonth = this.date;
+    }
+    if (this.initialVisibleMonth) {
+      currentMonth = this.initialVisibleMonth();
+    }
 
     return {
       isTouchSupported: false,
-      today: moment(),
+      today,
       hoverDate: null,
-      currentMonth: moment(),
-      visibleDays: {}
+      currentMonth
     };
   },
-  computed: {},
+  computed: {
+    modifierFns() {
+      return {
+        today: day => this.isToday(day),
+        blocked: day => this.isBlocked(day),
+        "blocked-calendar": day => this.isDayBlocked(day),
+        "blocked-out-of-range": day => this.isOutsideRange(day),
+        "highlighted-calendar": day => this.isDayHighlighted(day),
+        valid: day => !this.isBlocked(day),
+        hovered: day => this.isHovered(day),
+        selected: day => this.isSelected(day)
+      };
+    },
+    visibleDays() {
+      const {
+        currentMonth,
+        numberOfMonths,
+        enableOutsideDays,
+        hoverDate
+      } = this;
+
+      const modifiers = this.getModifiers(
+        getVisibleDays(currentMonth, numberOfMonths, enableOutsideDays)
+      );
+
+      if (!hoverDate) {
+        return modifiers;
+      }
+      if (
+        !isDayVisible(
+          hoverDate,
+          currentMonth,
+          numberOfMonths,
+          enableOutsideDays
+        )
+      ) {
+        return modifiers;
+      }
+
+      const isoMonth = toISOMonthString(hoverDate);
+      const isoDay = toISODateString(hoverDate);
+      const dayModifiers = modifiers[isoMonth][isoDay];
+      dayModifiers.push("hovered");
+      modifiers[isoMonth][isoDay] = unique(dayModifiers);
+
+      return modifiers;
+    }
+  },
   methods: {
     onDayClick(day, e) {
       if (e) {
@@ -194,7 +273,7 @@ export default {
       modifiers = this.addModifier(modifiers, day, "hovered");
 
       this.hoverDate = day;
-      this.visibleDays = Object.assign({}, this.visibleDays, modifiers);
+      // this.visibleDays = Object.assign({}, this.visibleDays, modifiers);
     },
     onDayMouseLeave() {
       if (this.isTouchSupported || !this.hoverDate) {
@@ -204,58 +283,58 @@ export default {
       const modifiers = this.deleteModifier({}, this.hoverDate, "hovered");
 
       this.hoverDate = null;
-      this.visibleDays = Object.assign({}, this.visibleDays, modifiers);
+      // this.visibleDays = Object.assign({}, this.visibleDays, modifiers);
     },
     onPrevMonthClick() {
-      const newVisibleDays = {};
-      Object.keys(this.visibleDays)
-        .sort()
-        .slice(0, this.numberOfMonths + 1)
-        .forEach(month => {
-          newVisibleDays[month] = this.visibleDays[month];
-        });
+      // const newVisibleDays = {};
+      // Object.keys(this.visibleDays)
+      //   .sort()
+      //   .slice(0, this.numberOfMonths + 1)
+      //   .forEach(month => {
+      //     newVisibleDays[month] = this.visibleDays[month];
+      //   });
 
       const prevMonth = this.currentMonth.clone().substract(1, "month");
-      const prevMonthVisibleDays = getVisibleDays(
-        prevMonth,
-        1,
-        this.enableOutsideDays
-      );
+      // const prevMonthVisibleDays = getVisibleDays(
+      //   prevMonth,
+      //   1,
+      //   this.enableOutsideDays
+      // );
 
       this.currentMonth = prevMonth;
-      this.visibleDays = Object.assign(
-        {},
-        newVisibleDays,
-        this.getModifiers(prevMonthVisibleDays)
-      );
+      // this.visibleDays = Object.assign(
+      //   {},
+      //   newVisibleDays,
+      //   this.getModifiers(prevMonthVisibleDays)
+      // );
 
       this.handlePrevMonthClick(prevMonth.clone());
     },
     onNextMonthClick() {
-      const newVisibleDays = {};
-      Object.keys(this.visibleDays)
-        .sort()
-        .slice(1)
-        .forEach(month => {
-          newVisibleDays[month] = this.visibleDays[month];
-        });
+      // const newVisibleDays = {};
+      // Object.keys(this.visibleDays)
+      //   .sort()
+      //   .slice(1)
+      //   .forEach(month => {
+      //     newVisibleDays[month] = this.visibleDays[month];
+      //   });
 
-      const nextMonth = this.currentMonth
-        .clone()
-        .add(this.numberOfMonths, "month");
-      const nextMonthVisibleDays = getVisibleDays(
-        nextMonth,
-        1,
-        this.enableOutsideDays
-      );
+      // const nextMonth = this.currentMonth
+      //   .clone()
+      //   .add(this.numberOfMonths, "month");
+      // const nextMonthVisibleDays = getVisibleDays(
+      //   nextMonth,
+      //   1,
+      //   this.enableOutsideDays
+      // );
 
       const newCurrentMonth = this.currentMonth.clone().add(1, "month");
       this.currentMonth = newCurrentMonth;
-      this.visibleDays = Object.assign(
-        {},
-        newVisibleDays,
-        this.getModifiers(nextMonthVisibleDays)
-      );
+      // this.visibleDays = Object.assign(
+      //   {},
+      //   newVisibleDays,
+      //   this.getModifiers(nextMonthVisibleDays)
+      // );
 
       this.handleNextMonthClick(newCurrentMonth.clone());
     },
@@ -300,15 +379,15 @@ export default {
       return modifiers;
     },
     getModifiersForDay(day) {
-      return Object.keys(this.modifiers)
-        .filter(modifier => this.modifiers[modifier](day))
-        .filter((item, idx, self) => self.indexOf(item) === idx);
+      return unique(
+        Object.keys(this.modifierFns).filter(modifier =>
+          this.modifierFns[modifier](day)
+        )
+      );
     },
-    getStateForNewMonth() {
-      throw "todo";
-    },
-    addModifier() {},
-    deleteModifier() {},
+    // getStateForNewMonth() {},
+    // addModifier() {},
+    // deleteModifier() {},
     isBlocked(day) {
       return this.isDayBlocked(day) || this.isOutsideRange(day);
     },
@@ -320,80 +399,16 @@ export default {
     },
     isToday(day) {
       return isSameDay(day, this.today);
+    },
+    getCurrentMonth() {
+      return this.currentMonth;
     }
   },
   mounted() {
     this.isTouchSupported = isTouchSupported();
-    const { currentMonth, visibleDays } = this.getStateForNewMonth();
-    this.currentMonth = currentMonth;
-    this.visibleDays = visibleDays;
   },
-  render(h) {
-    const ctx = this;
-    const {
-      numberOfMonths,
-      orientation,
-      monthFormat,
-      renderMonth,
-      withPortal,
-      focused,
-      enableOutsideDays,
-      hideKeyboardShortcutsPanel,
-      daySize,
-      firstDayOfWeek,
-      renderDay,
-      isFocused,
-      isRTL,
-      phrases,
-      handleOutsideClick,
-      handleBlur,
-      showKeyboardShortcutsOnInit,
-      weekDayFormat,
-      verticalHeight,
-      noBorder,
-      transitionDuration,
-      currentMonth,
-      visibleDays
-    } = ctx;
-    const dayPickerEl = h(DayPicker, {
-      attrs: {
-        orientation,
-        enableOutsideDays,
-        visibleDays,
-        numberOfMonths,
-        handleDayClick: ctx.onDayClick,
-        handleDayMouseEnter: ctx.onDayMouseEnter,
-        handleDayMouseLeave: ctx.onDayMouseLeave,
-        handlePrevMonthClick: ctx.onPrevMonthClick,
-        handleNextMonthClick: ctx.onNextMonthClick,
-        monthFormat,
-        withPortal,
-        hidden: !focused,
-        hideKeyboardShortcutsPanel,
-        initialVisibleMonth: () => currentMonth,
-        firstDayOfWeek,
-        renderMonth,
-        renderDay,
-        isFocused,
-        getFirstFocusableDay: ctx.getFirstFocusableDay,
-        handleBlur,
-        phrases,
-        daySize,
-        isRTL,
-        showKeyboardShortcutsOnInit,
-        weekDayFormat,
-        verticalHeight,
-        noBorder,
-        transitionDuration
-      }
-    });
-
-    if (handleOutsideClick) {
-      return h(OutsideClickHandler, { attrs: { handleOutsideClick } }, [
-        dayPickerEl
-      ]);
-    }
-
-    return dayPickerEl;
+  beforeUpdate() {
+    this.today = moment();
   }
 };
+</script>

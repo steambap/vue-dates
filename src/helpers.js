@@ -345,3 +345,24 @@ export function getVisibleDays(
 
   return visibleDaysByMonth;
 }
+
+export function isInclusivelyAfterDay(a, b) {
+  if (!moment.isMoment(a) || !moment.isMoment(b)) {
+    return false;
+  }
+
+  return !isBeforeDay(a, b);
+}
+
+export function isNextDay(a, b) {
+  if (!moment.isMoment(a) || !moment.isMoment(b)) {
+    return false;
+  }
+  const nextDay = moment(a).add(1, 'day');
+
+  return isSameDay(nextDay, b);
+}
+
+export function unique(arr) {
+  return arr.filter((item, idx, self) => self.indexOf(item) === idx);
+}
