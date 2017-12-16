@@ -10,7 +10,7 @@
 - [ ] DateRangePicker_input
 - [x] DayPicker
 - [ ] DayPickerRangeController
-- [ ] DayPickerSingleDateController
+- [x] DayPickerSingleDateController
 - [ ] PresetDateRangePicker
 - [ ] SingleDatePicker
 - [ ] SingleDatePicker_calendar
@@ -36,13 +36,12 @@ npm install --save vue-dates
 
 ## How to use
 
-There is only one component `DayPicker` right now.
 If you are using Webpack:
 ```JS
 // css
-import "vue-dates/dist/style.css";
+import  "vue-dates/dist/style.css";
 // vue component
-import DayPicker from "vue-dates/dist/day-picker";
+import { SingleDateController } from "vue-dates";
 ```
 
 ## License

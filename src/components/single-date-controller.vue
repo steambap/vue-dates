@@ -121,7 +121,7 @@ export default {
     },
     firstDayOfWeek: {
       type: Number,
-      default: null
+      default: moment.localeData().firstDayOfWeek()
     },
     daySize: {
       type: Number,
@@ -185,7 +185,7 @@ export default {
     }
   },
   data() {
-    const today = moment();
+    const today = (this.today = moment());
     let currentMonth = today;
     if (this.date) {
       currentMonth = this.date;
@@ -196,7 +196,6 @@ export default {
 
     return {
       isTouchSupported: false,
-      today,
       hoverDate: null,
       currentMonth
     };
@@ -269,78 +268,31 @@ export default {
         return;
       }
 
-      let modifiers = this.deleteModifier({}, this.hoverDate, "hovered");
-      modifiers = this.addModifier(modifiers, day, "hovered");
-
       this.hoverDate = day;
-      // this.visibleDays = Object.assign({}, this.visibleDays, modifiers);
     },
     onDayMouseLeave() {
       if (this.isTouchSupported || !this.hoverDate) {
         return;
       }
 
-      const modifiers = this.deleteModifier({}, this.hoverDate, "hovered");
-
       this.hoverDate = null;
-      // this.visibleDays = Object.assign({}, this.visibleDays, modifiers);
     },
     onPrevMonthClick() {
-      // const newVisibleDays = {};
-      // Object.keys(this.visibleDays)
-      //   .sort()
-      //   .slice(0, this.numberOfMonths + 1)
-      //   .forEach(month => {
-      //     newVisibleDays[month] = this.visibleDays[month];
-      //   });
-
-      const prevMonth = this.currentMonth.clone().substract(1, "month");
-      // const prevMonthVisibleDays = getVisibleDays(
-      //   prevMonth,
-      //   1,
-      //   this.enableOutsideDays
-      // );
+      const prevMonth = this.currentMonth.clone().subtract(1, "month");
 
       this.currentMonth = prevMonth;
-      // this.visibleDays = Object.assign(
-      //   {},
-      //   newVisibleDays,
-      //   this.getModifiers(prevMonthVisibleDays)
-      // );
 
       this.handlePrevMonthClick(prevMonth.clone());
     },
     onNextMonthClick() {
-      // const newVisibleDays = {};
-      // Object.keys(this.visibleDays)
-      //   .sort()
-      //   .slice(1)
-      //   .forEach(month => {
-      //     newVisibleDays[month] = this.visibleDays[month];
-      //   });
-
-      // const nextMonth = this.currentMonth
-      //   .clone()
-      //   .add(this.numberOfMonths, "month");
-      // const nextMonthVisibleDays = getVisibleDays(
-      //   nextMonth,
-      //   1,
-      //   this.enableOutsideDays
-      // );
-
       const newCurrentMonth = this.currentMonth.clone().add(1, "month");
       this.currentMonth = newCurrentMonth;
-      // this.visibleDays = Object.assign(
-      //   {},
-      //   newVisibleDays,
-      //   this.getModifiers(nextMonthVisibleDays)
-      // );
 
       this.handleNextMonthClick(newCurrentMonth.clone());
     },
     getFirstFocusableDay(newMonth) {
       const { date, numberOfMonths } = this;
-      const focusedDate = newMonth.clone().startOf("month");
+      let focusedDate = newMonth.clone().startOf("month");
       if (date) {
         focusedDate = date.clone();
       }
@@ -385,9 +337,6 @@ export default {
         )
       );
     },
-    // getStateForNewMonth() {},
-    // addModifier() {},
-    // deleteModifier() {},
     isBlocked(day) {
       return this.isDayBlocked(day) || this.isOutsideRange(day);
     },

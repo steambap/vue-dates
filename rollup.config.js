@@ -1,11 +1,14 @@
 import vue from "rollup-plugin-vue";
 
 export default {
-  input: 'src/components/day-picker.vue',
-  output: {
-    file: 'dist/day-picker.js',
+  input: 'src/components/index.js',
+  output: [{
+    file: 'dist/index.js',
     format: 'cjs'
-  },
+  }, {
+    file: 'dist/index.es.js',
+    format: 'es'
+  }],
   plugins: [
     vue({
       compileTemplate: true,

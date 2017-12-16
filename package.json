@@ -1,10 +1,11 @@
 {
   "name": "vue-dates",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Yet another datepicker for vue.js",
   "scripts": {
     "storybook": "poi --config .storybook/poi.config.js --storybook",
     "storybook:build": "poi build --config .storybook/poi.config.js --storybook",
+    "prepublishOnly": "npm run build",
     "build": "rollup -c rollup.config.js",
     "test": "jest --config test/config.js"
   },
@@ -17,6 +18,7 @@
     "datepicker"
   ],
   "main": "index.js",
+  "module": "dist/index.es.js",
   "files": [
     "dist/*",
     "*.md"
