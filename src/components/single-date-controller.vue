@@ -29,7 +29,9 @@
     :no-border="noBorder"
     :transition-duration="transitionDuration"
   >
-    <slot name="info-panel"></slot>
+    <template slot="info-panel">
+      <slot name="info-panel"></slot>
+    </template>
   </day-picker>
 </template>
 

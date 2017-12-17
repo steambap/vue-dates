@@ -19,7 +19,9 @@
     :month-format="monthFormat"
     :transition-duration="transitionDuration"
   >
-    <slot name="info-panel"></slot>
+    <template slot="info-panel">
+      <slot name="info-panel"></slot>
+    </template>
   </single-date-controller>
 </template>
 
