@@ -27,6 +27,7 @@
 				:focused-date="month.isVisible ? focusedDate : null"
 				:is-focused="isFocused"
 				:set-month-height-cb="month.setMonthHeight"
+        :day-aria-label-format="dayAriaLabelFormat"
 			></calendar-month>
 		</div>
 	</div>
@@ -144,6 +145,9 @@ export default {
     monthFormat: {
       type: String,
       default: "MMMM YYYY"
+    },
+    dayAriaLabelFormat: {
+      type: String
     }
   },
   computed: {

@@ -83,6 +83,7 @@
             :focused-date="focusedDate"
             :is-r-t-l="isRTL"
             :transition-duration="transitionDuration"
+            :day-aria-label-format="dayAriaLabelFormat"
           >
           </calendar-month-grid>
           <day-picker-navigation
@@ -282,6 +283,9 @@ export default {
       default: function() {
         return DayPickerPhrases;
       }
+    },
+    dayAriaLabelFormat: {
+      type: String
     }
   },
   data() {

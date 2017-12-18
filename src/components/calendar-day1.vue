@@ -10,6 +10,7 @@
 			@click="onClick($event)"
 			:tabindex="tabIndex"
 			ref="button"
+      :aria-label="ariaLabel"
 		>
 			{{formatDay}}
 		</button>
@@ -18,8 +19,8 @@
 
 <script>
 import moment from "moment";
-import { DAY_SIZE } from "../constants";
-import { contains } from "../helpers";
+import { DAY_SIZE, BLOCKED_MODIFIER } from "../constants";
+import { contains, getPhrase } from "../helpers";
 import { CalendarDayPhrases } from "../phrases";
 
 export default {
@@ -137,6 +138,15 @@ export default {
       return this.renderDay
         ? this.renderDay(this.day, this.modifiers)
         : this.day.format("D");
+    },
+    ariaLabel() {
+      const formattedDate = {date: this.day.format(this.ariaLabelFormat)};
+
+      if (this.modifiers.indexOf(BLOCKED_MODIFIER) > -1) {
+        return getPhrase(this.phrases.dateIsUnavailable, formattedDate);
+      }
+
+      return getPhrase(this.phrases.chooseAvailableDate, formattedDate);
     }
   },
   methods: {

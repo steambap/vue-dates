@@ -23,6 +23,8 @@
 						:handle-day-click="handleDayClick"
 						:render-day="renderDay"
 						:modifiers="modifiers[toISODateString(day)]"
+            :phrases="phrases"
+            :aria-label-format="dayAriaLabelFormat"
 					></CalendarDay>
 				</tr>
 			</tbody>
@@ -44,6 +46,7 @@ import {
   toISODateString,
   calculateDimension
 } from "../helpers";
+import { CalendarDayPhrases } from "../phrases";
 import CalendarDay from "./calendar-day";
 
 export default {
@@ -119,6 +122,15 @@ export default {
     monthFormat: {
       type: String,
       default: "MMMM YYYY"
+    },
+    phrases: {
+      type: Object,
+      default: function() {
+        return CalendarDayPhrases;
+      }
+    },
+    dayAriaLabelFormat: {
+      type: String
     }
   },
   computed: {
