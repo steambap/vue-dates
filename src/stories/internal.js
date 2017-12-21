@@ -6,6 +6,7 @@ import CalendarMonth from "../components/calendar-month.vue";
 import CalendarMonthGrid from "../components/calendar-month-grid.vue";
 import DayPickerNavigation from "../components/day-picker-navigation.vue";
 import DayPickerKeyboardShortcuts from "../components/day-picker-keyboard-shortcuts.vue";
+import SingleDateInput from "../components/single-date-input.vue";
 
 storiesOf("internal", module)
   .add("CalendayDay", () => ({
@@ -41,6 +42,11 @@ storiesOf("internal", module)
           handleNextMonthClick={this.onNextClick}
         />
       );
+    }
+  }))
+  .add("SingleDateInput", () => ({
+    render() {
+      return <SingleDateInput id="date" />;
     }
   }))
   .add("DayPickerKeyboardShortcuts", () => ({
