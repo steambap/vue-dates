@@ -260,7 +260,7 @@ export function getResponsiveContainerStyles(
 
   return {
     [anchorDirection]: Math.min(
-      currentOffset + calculatedOffset - calculatedMargin,
+      currentOffset + calculatedOffset - calculatedMargin + "px",
       0
     )
   };
@@ -376,4 +376,15 @@ export function getPhrase(phrase, args) {
   }
 
   return "";
+}
+
+export function toLocalizedDateString(date, currentFormat) {
+  const dateObj = moment.isMoment(date)
+    ? date
+    : toMomentObject(date, currentFormat);
+  if (!dateObj) {
+    return null;
+  }
+
+  return dateObj.format(DISPLAY_FORMAT);
 }

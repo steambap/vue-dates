@@ -1,12 +1,17 @@
 <template>
   <div
-    class="SingleDatePicker_picker"
-  ></div>
+    class="SingleDatePicker"
+    ref="container"
+    :class="{ SingleDatePicker__block: block }"
+  >
+    <outside-click-handler :handle-outside-click="onClearFocus">
+    </outside-click-handler>
+  </div>
 </template>
 
 <script>
-import moment from 'moment';
-import throttle from 'lodash/throttle';
+import moment from "moment";
+import throttle from "lodash/throttle";
 import { XCircleIcon } from "vue-feather-icons";
 import OutsideClickHandler from "./outside-click-handler";
 import SingleDateInput from "./single-date-input.vue";
@@ -15,17 +20,28 @@ import {
   HORIZONTAL_ORIENTATION,
   VERTICAL_ORIENTATION,
   ANCHOR_LEFT,
+  ANCHOR_RIGHT,
   OPEN_UP,
   OPEN_DOWN,
   DAY_SIZE,
   ICON_BEFORE_POSITION
 } from "../constants";
 import { SingleDatePickerPhrases } from "../phrases";
-import { isTouchSupported } from "../helpers";
+import {
+  isTouchSupported,
+  toLocalizedDateString,
+  toMomentObject,
+  getResponsiveContainerStyles
+} from "../helpers";
 
 export default {
-  name: 'single-date-picker',
-  components: {OutsideClickHandler, SingleDateInput, SingleDateController, XCircleIcon},
+  name: "single-date-picker",
+  components: {
+    OutsideClickHandler,
+    SingleDateInput,
+    SingleDateController,
+    XCircleIcon
+  },
   props: {
     date: {
       type: moment,
@@ -45,11 +61,11 @@ export default {
     },
     id: {
       type: String,
-      default: 'date'
+      default: "date"
     },
     placeholder: {
       type: String,
-      default: 'Date'
+      default: "Date"
     },
     disabled: {
       type: Boolean,
@@ -190,11 +206,11 @@ export default {
     },
     monthFormat: {
       type: String,
-      default: 'MMMM YYYY'
+      default: "MMMM YYYY"
     },
     weekDayFormat: {
       type: String,
-      default: 'dd'
+      default: "dd"
     },
     phrases: {
       type: Object,
@@ -205,23 +221,116 @@ export default {
   },
   data() {
     return {
-      isTouchDevice: false,
+      isTouchSupported: false,
       isDayPickerFocused: false,
       isInputFocused: false,
       showKeyboardShortcuts: false
+    };
+  },
+  computed: {
+    containerStyle() {
+      const { anchorDirection, horizontalMargin } = this;
+
+      const containerRect = this.$refs.container.getBoundingClientRect();
+      const containerEdge =
+        anchorDirection === ANCHOR_LEFT
+          ? containerRect[ANCHOR_RIGHT]
+          : containerRect[ANCHOR_LEFT];
+
+      return getResponsiveContainerStyles(
+        anchorDirection,
+        0,
+        containerEdge,
+        horizontalMargin
+      );
+    },
+    containerClass() {
+
     }
   },
   methods: {
-    adjustPickerPosition() {}
+    onChange(dateString) {
+      const {
+        isOutsideRange,
+        keepOpenOnDateSelect,
+        handleDateChange,
+        handleFocusChange,
+        handleClose
+      } = this;
+      const newDate = toMomentObject(dateString, this.displayFormat());
+
+      const isValid = newDate && !isOutsideRange(newDate);
+      if (isValid) {
+        handleDateChange(newDate);
+        if (!keepOpenOnDateSelect) {
+          handleFocusChange({ focused: false });
+          handleClose({ date: newDate });
+        }
+      } else {
+        handleDateChange(null);
+      }
+    },
+    onFocus() {
+      const { disabled, handleFocusChange, isTouchSupported } = this;
+      if (isTouchSupported) {
+        this.onDayPickerFocus();
+      } else {
+        this.onDayPickerBlur();
+      }
+
+      if (!disabled) {
+        handleFocusChange({ focused: true });
+      }
+    },
+    onClearFocus() {
+      const { date, focused, handleFocusChange, handleClose } = this;
+      if (!focused) {
+        return;
+      }
+
+      this.isInputFocused = false;
+      this.isDayPickerFocused = false;
+
+      handleFocusChange({ focused: false });
+      handleClose({ date });
+    },
+    onDayPickerFocus() {
+      this.isInputFocused = false;
+      this.isDayPickerFocused = true;
+      this.showKeyboardShortcuts = false;
+    },
+    onDayPickerBlur() {
+      this.isInputFocused = true;
+      this.isDayPickerFocused = false;
+      this.showKeyboardShortcuts = false;
+    },
+    getDateString(date) {
+      const displayFormat = this.displayFormat();
+      if (date && displayFormat) {
+        return date && date.format(displayFormat);
+      }
+
+      return toLocalizedDateString(date);
+    },
+    clearDate() {
+      this.handleDateChange(null);
+      if (this.reopenPickerOnClearDate) {
+        this.handleFocusChange({ focused: true });
+      }
+    },
+    showKeyboardShortcutsPanel() {
+      this.isInputFocused = false;
+      this.isDayPickerFocused = true;
+      this.showKeyboardShortcuts = true;
+    }
   },
   mounted() {
-    this.isTouchDevice = isTouchSupported();
-    window.addEventListener("resize", this.adjustPickerPosition, true);
-  },
-  beforeDestroy() {
-    window.removeEventListener("resize", this.adjustPickerPosition, true);
-  },
-}
+    this.isTouchSupported = isTouchSupported();
+    if (this.focused) {
+      this.isInputFocused = true;
+    }
+  }
+};
 </script>
 
 <style>
