@@ -1,10 +1,78 @@
 <template>
   <div
     class="SingleDatePicker"
-    ref="container"
     :class="{ SingleDatePicker__block: block }"
   >
     <outside-click-handler :handle-outside-click="onClearFocus">
+      <single-date-input
+        :id="id"
+        :placeholder="placeholder"
+        :focused="focused"
+        :is-focused="isInputFocused"
+        :disabled="disabled"
+        :required="required"
+        :read-only="readOnly"
+        :open-direction="openDirection"
+        :show-caret="true"
+        :handle-clear-date="clearDate"
+        :show-clear-date="showClearDate"
+        :show-default-input-icon="showDefaultInputIcon"
+        :input-icon-position="inputIconPosition"
+        :display-value="getDateString(date)"
+        :handle-change="onChange"
+        :handle-focus="onFocus"
+        :handle-key-down-shift-tab="onClearFocus"
+        :handle-key-down-tab="onClearFocus"
+        :handle-key-down-arrow-down="onDayPickerFocus"
+        :handle-key-down-question-mark="showKeyboardShortcutsPanel"
+        :screen-reader-message="screenReaderInputMessage"
+        :phrases="phrases"
+        :is-r-t-l="isRTL"
+        :no-border="noBorder"
+        :block="block"
+      ></single-date-input>
+
+      <div
+        ref="container"
+        v-show="focused"
+        class="SingleDatePicker_picker"
+        :class="containerClass"
+        :style="containerStyle"
+      >
+        <single-date-controller
+          :date="date"
+          :handle-date-change="handleDateChange"
+          :handle-focus-change="handleFocusChange"
+          :orientation="orientation"
+          :enable-outside-days="enableOutsideDays"
+          :number-of-months="numberOfMonths"
+          :month-format="monthFormat"
+          :focused="focused"
+          :keep-open-on-date-select="keepOpenOnDateSelect"
+          :hide-keyboard-shortcuts-panel="hideKeyboardShortcutsPanel"
+          :initial-visible-month="initialVisibleMonth"
+          :handle-close="handleClose"
+          :render-month="renderMonth"
+          :render-day="renderDay"
+          :is-focused="isDayPickerFocused"
+          :show-keyboard-shortcuts-on-init="showKeyboardShortcuts"
+          :handle-blur="onDayPickerBlur"
+          :phrases="phrases"
+          :day-size="daySize"
+          :is-r-t-l="isRTL"
+          :is-outside-range="isOutsideRange"
+          :is-day-highlighted="isDayHighlighted"
+          :is-day-blocked="isDayBlocked"
+          :first-day-of-week="firstDayOfWeek"
+          :week-day-format="weekDayFormat"
+          :vertical-height="verticalHeight"
+          :transition-duration="transitionDuration"
+        >
+          <template slot="info-panel">
+            <slot name="info-panel"></slot>
+          </template>
+        </single-date-controller>
+      </div>
     </outside-click-handler>
   </div>
 </template>
@@ -102,9 +170,6 @@ export default {
     block: {
       type: Boolean,
       default: false
-    },
-    renderMonth: {
-      type: Function
     },
     orientation: {
       type: String,
@@ -230,8 +295,12 @@ export default {
   computed: {
     containerStyle() {
       const { anchorDirection, horizontalMargin } = this;
+      const ctnr = this.$refs.container;
+      if (!ctnr) {
+        return {};
+      }
 
-      const containerRect = this.$refs.container.getBoundingClientRect();
+      const containerRect = ctnr.getBoundingClientRect();
       const containerEdge =
         anchorDirection === ANCHOR_LEFT
           ? containerRect[ANCHOR_RIGHT]
@@ -245,7 +314,15 @@ export default {
       );
     },
     containerClass() {
-
+      return {
+        SingleDatePicker_picker__directionLeft: this.anchorDirection === ANCHOR_LEFT,
+        SingleDatePicker_picker__directionRight: this.anchorDirection === ANCHOR_RIGHT,
+        SingleDatePicker_picker__openDown: this.openDirection === OPEN_DOWN,
+        SingleDatePicker_picker__openUp: this.openDirection === OPEN_UP,
+        SingleDatePicker_picker__horizontal: this.orientation === HORIZONTAL_ORIENTATION,
+        SingleDatePicker_picker__vertical: this.orientation === VERTICAL_ORIENTATION,
+        SingleDatePicker_picker__rtl: this.isRTL
+      };
     }
   },
   methods: {
