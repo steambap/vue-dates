@@ -1,10 +1,31 @@
+import moment from "moment";
 import { storiesOf } from "storybook-vue";
 import SingleDatePicker from "./single-date-picker-wrapper";
+import { VERTICAL_ORIENTATION } from "../constants";
 
 storiesOf("SingleDatePicker", module)
   .add("default", () => ({
     render() {
       return <SingleDatePicker />;
+    }
+  }))
+  .add("non-english locale (Chinese)", () => ({
+    render() {
+      moment.locale("zh-cn");
+
+      return (
+        <SingleDatePicker placeholder="入住日期" monthFormat="YYYY[年]MMMM" />
+      );
+    }
+  }))
+  .add("vertical with custom height", () => ({
+    render() {
+      return (
+        <SingleDatePicker
+          orientation={VERTICAL_ORIENTATION}
+          verticalHeight={568}
+        />
+      );
     }
   }))
   .add("with no animation", () => ({

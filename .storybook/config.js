@@ -1,4 +1,5 @@
 import { configure } from "storybook-vue";
+import "./style.css";
 
 function loadStories() {
   require("../src/stories/single-date-picker");

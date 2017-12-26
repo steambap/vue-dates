@@ -5,17 +5,11 @@
 ## Todo
 
 - [ ] DateRangePicker
-- [ ] DateRangePicker_calendar
-- [ ] DateRangePicker_day
-- [ ] DateRangePicker_input
 - [x] DayPicker
 - [ ] DayPickerRangeController
 - [x] DayPickerSingleDateController
 - [ ] PresetDateRangePicker
-- [ ] SingleDatePicker
-- [ ] SingleDatePicker_calendar
-- [ ] SingleDatePicker_day
-- [ ] SingleDatePicker_input
+- [x] SingleDatePicker
 
 ## Live Playground
 
@@ -41,7 +35,7 @@ If you are using Webpack:
 // css
 import  "vue-dates/dist/style.css";
 // vue component
-import { SingleDateController } from "vue-dates";
+import { SingleDatePicker } from "vue-dates";
 ```
 
 ## License

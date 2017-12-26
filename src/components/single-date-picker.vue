@@ -33,8 +33,8 @@
       ></single-date-input>
 
       <div
+        v-if="focused"
         ref="container"
-        v-show="focused"
         class="SingleDatePicker_picker"
         :class="containerClass"
         :style="containerStyle"
