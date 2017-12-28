@@ -1,6 +1,7 @@
 import moment from "moment";
 import { storiesOf } from "storybook-vue";
 import SingleDatePicker from "./single-date-picker-wrapper";
+import PresetSingleDatePicker from "../components/preset-single-date-picker.vue";
 import { VERTICAL_ORIENTATION } from "../constants";
 
 storiesOf("SingleDatePicker", module)
@@ -32,4 +33,12 @@ storiesOf("SingleDatePicker", module)
     render() {
       return <SingleDatePicker transitionDuration={0} />;
     }
+  }))
+  .add("preset", () => ({
+    components: { PresetSingleDatePicker },
+    data() {
+      return { day: moment() };
+    },
+    template:
+      "<preset-single-date-picker v-model='day'></preset-single-date-picker>"
   }));
