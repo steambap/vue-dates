@@ -40,6 +40,7 @@
     "poi": "^9.6.2",
     "poi-preset-storybook": "^0.1.2",
     "rollup": "^0.52.1",
+    "rollup-plugin-buble": "^0.18.0",
     "rollup-plugin-vue": "^3.0.0",
     "storybook-vue": "^3.2.16",
     "vue-jest": "^1.4.0",

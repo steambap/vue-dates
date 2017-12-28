@@ -191,7 +191,19 @@ acorn-globals@^4.0.0:
   dependencies:
     acorn "^5.0.0"
 
-acorn@^3.1.0, acorn@~3.3.0:
+acorn-jsx@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-3.0.1.tgz#afdf9488fb1ecefc8348f6fb22f464e32a58b36b"
+  dependencies:
+    acorn "^3.0.4"
+
+acorn5-object-spread@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/acorn5-object-spread/-/acorn5-object-spread-4.0.0.tgz#d5758081eed97121ab0be47e31caaef2aa399697"
+  dependencies:
+    acorn "^5.1.2"
+
+acorn@^3.0.4, acorn@^3.1.0, acorn@~3.3.0:
   version "3.3.0"
   resolved "http://registry.npm.taobao.org/acorn/download/acorn-3.3.0.tgz#45e37fb39e8da3f25baee3ff5369e2bb5f22017a"
 
@@ -1329,6 +1341,19 @@ bser@^2.0.0:
   resolved "https://registry.yarnpkg.com/bser/-/bser-2.0.0.tgz#9ac78d3ed5d915804fd87acb158bc797147a1719"
   dependencies:
     node-int64 "^0.4.0"
+
+buble@^0.18.0:
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/buble/-/buble-0.18.0.tgz#63b338b8248c474b46fd3e3546560ae08d8abe91"
+  dependencies:
+    acorn "^5.1.2"
+    acorn-jsx "^3.0.1"
+    acorn5-object-spread "^4.0.0"
+    chalk "^2.1.0"
+    magic-string "^0.22.4"
+    minimist "^1.2.0"
+    os-homedir "^1.0.1"
+    vlq "^0.2.2"
 
 buffer-indexof@^1.0.0:
   version "1.1.1"
@@ -6213,6 +6238,13 @@ ripemd160@^2.0.0, ripemd160@^2.0.1:
     hash-base "^2.0.0"
     inherits "^2.0.1"
 
+rollup-plugin-buble@^0.18.0:
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/rollup-plugin-buble/-/rollup-plugin-buble-0.18.0.tgz#6e20d1b2840c59eb496b9f954f75243e51786ac1"
+  dependencies:
+    buble "^0.18.0"
+    rollup-pluginutils "^2.0.1"
+
 rollup-plugin-vue@^3.0.0:
   version "3.0.0"
   resolved "http://registry.npm.taobao.org/rollup-plugin-vue/download/rollup-plugin-vue-3.0.0.tgz#4fd08d2cfbb87321d070f016559cb11645e9f544"
@@ -7135,7 +7167,7 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-vlq@^0.2.1:
+vlq@^0.2.1, vlq@^0.2.2:
   version "0.2.3"
   resolved "http://registry.npm.taobao.org/vlq/download/vlq-0.2.3.tgz#8f3e4328cf63b1540c0d67e1b2778386f8975b26"
 

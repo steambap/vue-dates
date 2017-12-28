@@ -9,7 +9,7 @@
 - [X] DayPickerRangeController
 - [x] DayPickerSingleDateController
 - [ ] PresetDateRangePicker
-- [ ] PresetSingleDatePicker
+- [x] PresetSingleDatePicker
 - [x] SingleDatePicker
 
 ## Live Playground
@@ -36,7 +36,7 @@ If you are using Webpack:
 // css
 import  "vue-dates/dist/style.css";
 // Vue component
-import { SingleDatePicker } from "vue-dates";
+import { PresetSingleDatePicker } from "vue-dates";
 ```
 
 ## License

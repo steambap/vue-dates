@@ -1,4 +1,5 @@
 import vue from "rollup-plugin-vue";
+import buble from "rollup-plugin-buble";
 
 export default {
   input: 'src/components/index.js',
@@ -14,6 +15,7 @@ export default {
       compileTemplate: true,
       htmlMinifier: { collapseBooleanAttributes: false },
       css: 'dist/style.css'
-    })
+    }),
+    buble()
   ]
 };
