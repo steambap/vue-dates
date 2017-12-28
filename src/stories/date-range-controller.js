@@ -29,6 +29,13 @@ storiesOf("DateRangeController", module)
       return <DateRangeController monthFormat="YYYY[年]MMMM" />;
     }
   }))
+  .add("with minimum nights set", () => ({
+    render() {
+      return (
+        <DateRangeController minimumNights={3} autoFocusEndDate />
+      );
+    }
+  }))
   .add("with some highlighted dates", () => ({
     render() {
       return (
