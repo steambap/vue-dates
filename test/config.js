@@ -3,7 +3,7 @@ const path = require("path");
 module.exports = {
   moduleFileExtensions: ["js", "vue"],
   transform: {
-    "^.+\\.js$": path.join(__dirname, "babel-transform.js"),
+    "^.+\\.js$": require.resolve("babel-jest"),
     ".*\\.(vue)$": require.resolve("vue-jest")
   },
   mapCoverage: true

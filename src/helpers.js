@@ -15,7 +15,7 @@ export function contains(arr, elm) {
 export function getCalendarMonthWeeks(
   month,
   enableOutsideDays,
-  firstDayOfWeek
+  firstDayOfWeek = moment.localeData().firstDayOfWeek()
 ) {
   if (!moment.isMoment(month) || !month.isValid()) {
     throw new TypeError("`month` must be a valid moment object");
