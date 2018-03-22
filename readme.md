@@ -1,5 +1,7 @@
 # vue-dates
 
+[![CircleCI](https://circleci.com/gh/steambap/vue-dates.svg?style=svg)](https://circleci.com/gh/steambap/vue-dates)
+
 > airbnb/react-dates for vue 2.x. Work in progress.
 
 ## Todo
