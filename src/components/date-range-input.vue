@@ -74,7 +74,7 @@ import {
   OPEN_DOWN,
   OPEN_UP
 } from "../contants";
-import { DateRangePickerPhrases } from "../phrases";
+import { DateRangePickerInputPhrases } from "../phrases";
 
 export default {
   name: "date-range-input",
@@ -203,7 +203,7 @@ export default {
     phrases: {
       type: Object,
       default: function() {
-        return DateRangePickerPhrases;
+        return DateRangePickerInputPhrases;
       }
     }
   },
