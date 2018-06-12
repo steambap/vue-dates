@@ -1,4 +1,4 @@
-import { mount, shallow } from "vue-test-utils";
+import { mount, shallowMount } from "@vue/test-utils";
 import SingleDatePicker from "../src/components/single-date-picker.vue";
 import SingleDateController from "../src/components/single-date-controller.vue";
 
@@ -10,7 +10,7 @@ const propsData = {
 
 describe("render", () => {
   test("Component is a Vue instance", () => {
-    const wrapper = shallow(SingleDatePicker, { propsData });
+    const wrapper = shallowMount(SingleDatePicker, { propsData });
     expect(wrapper.isVueInstance()).toBeTruthy();
   });
 

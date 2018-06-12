@@ -5,6 +5,5 @@ module.exports = {
   transform: {
     "^.+\\.js$": require.resolve("babel-jest"),
     ".*\\.(vue)$": require.resolve("vue-jest")
-  },
-  mapCoverage: true
+  }
 };
