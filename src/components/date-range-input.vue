@@ -5,7 +5,7 @@
       'DateRangePickerInput__disabled': disabled,
       'DateRangePickerInput__rtl': isRTL,
       'DateRangePickerInput__withBorder': !noBorder,
-      'DateRangePickerInput__block': blcok,
+      'DateRangePickerInput__block': block,
       'DateRangePickerInput__showClearDates': showClearDates
     }"
   >
@@ -21,22 +21,48 @@
     </button>
     <date-input
       :id="startDateId"
-      :placeholder="startDatePlaceholder"
-      :display-value="startDate"
-      :screen-reader-message="screenReaderMessage || phrases.keyboardNavigationInstructions"
-      :focused="focused"
-      :is-focused="isFocused"
-      :disabled="disabled"
+      :placeholder="startDatePlaceholderText"
+      :displayValue="startDate"
+      :screenReaderMessage="screenReaderText"
+      :focused="isStartDateFocused"
+      :isFocused="isFocused"
+      :disabled="startDateDisabled"
       :required="required"
-      :read-only="readOnly"
-      :show-caret="showCaret"
-      :open-direction="openDirection"
-      :handle-change="handleStartDateChange"
-      :handle-focus="handleStartDateFocus"
-      :handle-key-down-shift-tab="handleStartDateShiftTab"
-      :handle-key-down-arrow-down="handleKeyDownArrowDown"
-      :handle-key-down-question-mark="handleKeyDownQuestionMark"
+      :readOnly="readOnly"
+      :showCaret="showCaret"
+      :openDirection="openDirection"
+      :onChange="onStartDateChange"
+      :handleFocus="onStartDateFocus"
+      :onKeyDownShiftTab="onStartDateShiftTab"
+      :onKeyDownArrowDown="onKeyDownArrowDown"
+      :onKeyDownQuestionMark="onKeyDownQuestionMark"
+      :verticalSpacing="verticalSpacing"
+      :small="small"
+      :regular="regular"
     ></date-input>
+
+    <date-input
+      :id="endDateId"
+      :placeholder="endDatePlaceholderText"
+      :displayValue="endDate"
+      :screenReaderMessage="screenReaderText"
+      :focused="isEndDateFocused"
+      :isFocused="isFocused"
+      :disabled="endDateDisabled"
+      :required="required"
+      :readOnly="readOnly"
+      :showCaret="showCaret"
+      :openDirection="openDirection"
+      :onChange="onEndDateChange"
+      :handleFocus="onEndDateFocus"
+      :onKeyDownTab="onEndDateTab"
+      :onKeyDownArrowDown="onKeyDownArrowDown"
+      :onKeyDownQuestionMark="onKeyDownQuestionMark"
+      :verticalSpacing="verticalSpacing"
+      :small="small"
+      :regular="regular"
+    ></date-input>
+
     <button
       v-if="showClearDates"
       type="button"
@@ -73,7 +99,7 @@ import {
   ICON_AFTER_POSITION,
   OPEN_DOWN,
   OPEN_UP
-} from "../contants";
+} from "../constants";
 import { DateRangePickerInputPhrases } from "../phrases";
 
 export default {
@@ -84,66 +110,68 @@ export default {
       type: String,
       default: START_DATE
     },
-    startDatePlaceholder: {
-      type: String,
-      default: "Start Date"
-    },
-    screenReaderMessage: {
-      type: String,
-      default: ""
-    },
     endDateId: {
       type: String,
       default: END_DATE
     },
-    endDatePlaceholder: {
+    startDatePlaceholderText: {
       type: String,
-      default: "End Date"
+      default: 'Start Date'
     },
-    handleStartDateFocus: {
+    endDatePlaceholderText: {
+      type: String,
+      default: 'End Date'
+    },
+    screenReaderMessage: {
+      type: String,
+      default: ''
+    },
+    onStartDateFocus: {
       type: Function,
       default: function() {}
     },
-    handleEndDateFocus: {
+    onEndDateFocus: {
       type: Function,
       default: function() {}
     },
-    handleStartDateChange: {
+    onStartDateChange: {
       type: Function,
       default: function() {}
     },
-    handleEndDateChange: {
+    onEndDateChange: {
       type: Function,
       default: function() {}
     },
-    handleStartDateShiftTab: {
+    onStartDateShiftTab: {
       type: Function,
       default: function() {}
     },
-    handleEndDateTab: {
+    onEndDateTab: {
       type: Function,
       default: function() {}
     },
-    handleClearDates: {
+    onClearDates: {
       type: Function,
       default: function() {}
     },
-    handleKeyDownArrowDown: {
+    onKeyDownArrowDown: {
       type: Function,
       default: function() {}
     },
-    handleKeyDownQuestionMark: {
+    onKeyDownQuestionMark: {
       type: Function,
       default: function() {}
     },
+
     startDate: {
       type: String,
-      default: ""
+      default: ''
     },
     endDate: {
       type: String,
-      default: ""
+      default: ''
     },
+
     isStartDateFocused: {
       type: Boolean,
       default: false
@@ -184,9 +212,17 @@ export default {
       type: String,
       default: ICON_BEFORE_POSITION
     },
-    isRTL: {
-      type: Boolean,
-      default: false
+    customInputIcon: {
+      type: String,
+      default: null
+    },
+    customArrowIcon: {
+      type: String,
+      default: null
+    },
+    customCloseIcon: {
+      type: String,
+      default: null
     },
     noBorder: {
       type: Boolean,
@@ -196,15 +232,41 @@ export default {
       type: Boolean,
       default: false
     },
+    small: {
+      type: Boolean,
+      default: false
+    },
+    regular: {
+      type: Boolean,
+      default: false
+    },
+    verticalSpacing: {
+      type: Number,
+      default: undefined
+    },
+
+    // accessibility
     isFocused: {
       type: Boolean,
       default: false
     },
+
+    // i18n
     phrases: {
       type: Object,
-      default: function() {
-        return DateRangePickerInputPhrases;
-      }
+      default: DateRangePickerInputPhrases
+    },
+
+    isRTL: {
+      type: Boolean,
+      default: false
+    },
+  },
+  data() {
+    return {
+      screenReaderText: this.screenReaderMessage || this.phrases.keyboardNavigationInstructions,
+      startDateDisabled: this.disabled === START_DATE || this.disabled === true,
+      endDateDisabled: this.disabled === END_DATE || this.disabled === true
     }
   },
   computed: {
