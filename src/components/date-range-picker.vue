@@ -53,12 +53,9 @@
         v-if="isDateRangePickerInputFocused"
         ref="container"
         class="DateRangePicker_picker"
-
-      >
-      <!--
-                :class="containerClass"
+        :class="containerClass"
         :style="containerStyle"
-        -->
+      >
         <date-range-controller
           :orientation="orientation"
           :enableOutsideDays="enableOutsideDays"
@@ -715,7 +712,40 @@ export default {
 
       return toLocalizedDateString(date);
     },
-  }
+  },
+  computed: {
+    containerStyle() {
+      const { anchorDirection, horizontalMargin } = this;
+      const ctnr = this.$refs.container;
+      if (!ctnr) {
+        return {};
+      }
+
+      const containerRect = ctnr.getBoundingClientRect();
+      const containerEdge =
+        anchorDirection === ANCHOR_LEFT
+          ? containerRect[ANCHOR_RIGHT]
+          : containerRect[ANCHOR_LEFT];
+
+      return getResponsiveContainerStyles(
+        anchorDirection,
+        0,
+        containerEdge,
+        horizontalMargin
+      );
+    },
+    containerClass() {
+      return {
+        DateRangePicker_picker__directionLeft: this.anchorDirection === ANCHOR_LEFT,
+        DateRangePicker_picker__directionRight: this.anchorDirection === ANCHOR_RIGHT,
+        DateRangePicker_picker__openDown: this.openDirection === OPEN_DOWN,
+        DateRangePicker_picker__openUp: this.openDirection === OPEN_UP,
+        DateRangePicker_picker__horizontal: this.orientation === HORIZONTAL_ORIENTATION,
+        DateRangePicker_picker__vertical: this.orientation === VERTICAL_ORIENTATION,
+        DateRangePicker_picker__rtl: this.isRTL
+      };
+    }
+  },
 }
 </script>
 
