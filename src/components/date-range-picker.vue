@@ -169,38 +169,38 @@ export default {
       type: String,
       default: null
     },
-    placeholder: {
-      type: String,
-      default: null
-    },
-    focused: {
-      type: Boolean,
-      default: false
-    },
-    isInputFocused: {
-      type: String,
-      default: null
-    },
-    clearDate: {
-      type: String,
-      default: null
-    },
-    showClearDate: {
-      type: Boolean,
-      default: false
-    },
+    // placeholder: {
+    //   type: String,
+    //   default: null
+    // },
+    // focused: {
+    //   type: Boolean,
+    //   default: false
+    // },
+    // isInputFocused: {
+    //   type: String,
+    //   default: null
+    // },
+    // clearDate: {
+    //   type: String,
+    //   default: null
+    // },
+    // showClearDate: {
+    //   type: Boolean,
+    //   default: false
+    // },
     // getDateString: {
     //   type: Function,
     //   default: null
     // },
-    date: {
-      type: String,
-      default: null
-    },
-    onChange: {
-      type: Function,
-      default: null
-    },
+    // date: {
+    //   type: String,
+    //   default: null
+    // },
+    // onChange: {
+    //   type: Function,
+    //   default: null
+    // },
     // onFocus: {
     //   type: Function,
     //   default: null
