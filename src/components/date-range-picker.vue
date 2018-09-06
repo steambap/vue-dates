@@ -8,11 +8,11 @@
         :startDate="startDate"
         :startDateId="startDateId"
         :startDatePlaceholderText="startDatePlaceholderText"
-        :isStartDateFocused="focusedInput === START_DATE"
+        :isStartDateFocused="focusedInput === START_DATE && isDateRangePickerInputFocused === true"
         :endDate="endDate"
         :endDateId="endDateId"
         :endDatePlaceholderText="endDatePlaceholderText"
-        :isEndDateFocused="focusedInput === END_DATE"
+        :isEndDateFocused="focusedInput === END_DATE && isDateRangePickerInputFocused === true"
         :displayFormat="displayFormat"
         :showClearDates="showClearDates"
         :showCaret="!withPortal && !withFullScreenPortal && !hideFang"
@@ -50,7 +50,7 @@
       -->
 
       <div
-        v-if="isDateRangePickerInputFocused"
+        v-if="isDateRangePickerInputFocused && focusedInput === 'startDate' || isDateRangePickerInputFocused && focusedInput === 'endDate'"
         ref="container"
         class="DateRangePicker_picker"
         :class="containerClass"
