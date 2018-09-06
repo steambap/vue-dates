@@ -1,73 +1,102 @@
 <template>
   <date-range-picker
-    :date="value"
-    :focused="focused"
-    :handle-date-change="onDateChange"
-    :handle-focus-change="onFocusChange"
+    :onFocusChange="onFocusChange"
+    :onDatesChange="onDatesChange"
+    :focusedInput="focusedInput"
+    :startDate="startDate"
+    :endDate="endDate"
+
     :id="id"
-    :placeholder="placeholder"
+    :startDatePlaceholderText="startDatePlaceholderText"
+    :endDatePlaceholderText="endDatePlaceholderText"
     :disabled="disabled"
     :required="required"
     :read-only="readOnly"
-    :show-clear-date="showClearDate"
+    :screen-reader-input-message="screenReaderInputMessage"
+    :show-clear-dates="showClearDate"
     :show-default-input-icon="showDefaultInputIcon"
     :input-icon-position="inputIconPosition"
+    :custom-input-icon="customInputIcon"
+    :custom-arrow-icon="customArrowIcon"
+    :custom-close-icon="customCloseIcon"
     :no-border="noBorder"
     :block="block"
-    :render-month="renderMonth"
+    :small="small"
+    :regular="regular"
+    :keep-focus-on-input="keepFocusOnInput"
+
+    :render-month-text="renderMonthText"
     :orientation="orientation"
     :anchor-direction="anchorDirection"
     :open-direction="openDirection"
     :horizontal-margin="horizontalMargin"
+    :with-portal="withPortal"
+    :with-full-screen-portal="withFullScreenPortal"
+    :append-to-body="appendToBody"
+    :prop-disable-scroll="propDisableScroll"
     :initial-visible-month="initialVisibleMonth"
-    :first-day-of-week="firstDayOfWeek"
     :number-of-months="numberOfMonths"
     :keep-open-on-date-select="keepOpenOnDateSelect"
     :reopen-picker-on-clear-date="reopenPickerOnClearDate"
+    :render-calendar-info="renderCalendarInfo"
+    :calendar-info-position="calendarInfoPosition"
     :hide-keyboard-shortcuts-panel="hideKeyboardShortcutsPanel"
     :day-size="daySize"
     :is-r-t-l="isRTL"
+    :first-day-of-week="firstDayOfWeek"
     :vertical-height="verticalHeight"
     :transition-duration="transitionDuration"
-    :handle-prev-month-click="handlePrevMonthClick"
-    :handle-next-month-click="handleNextMonthClick"
-    :handle-close="handleClose"
-    :render-day="renderDay"
+    :vertical-spacing="verticalSpacing"
+
+    :nav-prev="navPrev"
+    :nav-next="navNext"
+    :on-prev-month-click="handlePrevMonthClick"
+    :on-next-month-click="handleNextMonthClick"
+    :on-close="handleClose"
+    :on-focus-change="handleFocusChange"
+
+    :render-calendar-day="renderCalendarDay"
+    :render-day-contents="renderDayContents"
+    :render-month-element="renderMonthElement"
+    :minimum-nights="minimumNights"
     :enable-outside-days="enableOutsideDays"
-    :is-outside-range="isOutsideRange"
     :is-day-blocked="isDayBlocked"
+    :is-outside-range="isOutsideRange"
     :is-day-highlighted="isDayHighlighted"
     :display-format="displayFormat"
     :month-format="monthFormat"
     :week-day-format="weekDayFormat"
     :phrases="phrases"
-  >
-    <template slot="info-panel">
-      <slot name="info-panel"></slot>
-    </template>
-  </date-range-picker>
+    :day-aria-label-format="dayAriaLabelFormat"
+  ></date-range-picker>
 </template>
 
 <script>
 import moment from "moment";
-import SingleDatePicker from "../components/date-range-picker.vue";
+import DateRangePicker from "./date-range-picker.vue";
 import {
   HORIZONTAL_ORIENTATION,
   ANCHOR_LEFT,
+  ANCHOR_RIGHT,
   OPEN_DOWN,
+  OPEN_UP,
   DAY_SIZE,
-  ICON_BEFORE_POSITION
+  ICON_BEFORE_POSITION,
+  INFO_POSITION_BOTTOM,
+  FANG_HEIGHT_PX,
+  DEFAULT_VERTICAL_SPACING
 } from "../constants";
+import { DateRangePickerPhrases } from "../phrases";
 
 export default {
   name: "date-range-picker-wrapper",
-  components: { SingleDatePicker },
+  components: { DateRangePicker },
   props: {
     autoFocus: {
       type: Boolean,
       default: false
     },
-    value: {
+    initialDate: {
       type: moment,
       default: null
     },
@@ -75,9 +104,13 @@ export default {
       type: String,
       default: "date"
     },
-    placeholder: {
+    startDatePlaceholderText: {
       type: String,
-      default: "Date"
+      default: 'Start Date'
+    },
+    endDatePlaceholderText: {
+      type: String,
+      default: 'End Date'
     },
     disabled: {
       type: Boolean,
@@ -91,6 +124,10 @@ export default {
       type: Boolean,
       default: null
     },
+    screenReaderInputMessage: {
+      type: String,
+      default: ""
+    },
     showClearDate: {
       type: Boolean,
       default: false
@@ -103,6 +140,18 @@ export default {
       type: String,
       default: ICON_BEFORE_POSITION
     },
+    customInputIcon: {
+      type: String,
+      default: null
+    },
+    customArrowIcon: {
+      type: String,
+      default: null
+    },
+    customCloseIcon: {
+      type: String,
+      default: null
+    },
     noBorder: {
       type: Boolean,
       default: false
@@ -110,6 +159,22 @@ export default {
     block: {
       type: Boolean,
       default: false
+    },
+    small: {
+      type: Boolean,
+      default: false
+    },
+    regular: {
+      type: Boolean,
+      default: false
+    },
+    keepFocusOnInput: {
+      type: Boolean,
+      default: false
+    },
+    renderMonthText: {
+      type: String,
+      default: null
     },
     orientation: {
       type: String,
@@ -127,12 +192,29 @@ export default {
       type: Number,
       default: 0
     },
+    withPortal: {
+      type: Boolean,
+      default: false
+    },
+    withFullScreenPortal: {
+      type: Boolean,
+      default: false
+    },
+    appendToBody: {
+      type: Boolean,
+      default: false
+    },
+    propDisableScroll: {
+      type: Boolean,
+      default: false
+    },
     initialVisibleMonth: {
       type: Function,
       default: null
     },
     firstDayOfWeek: {
-      type: Number
+      type: Number,
+      default: moment.localeData().firstDayOfWeek()
     },
     numberOfMonths: {
       type: Number,
@@ -145,6 +227,14 @@ export default {
     reopenPickerOnClearDate: {
       type: Boolean,
       default: false
+    },
+    renderCalendarInfo: {
+      type: String,
+      default: null
+    },
+    calendarInfoPosition: {
+      type: String,
+      default: INFO_POSITION_BOTTOM
     },
     hideKeyboardShortcutsPanel: {
       type: Boolean,
@@ -166,6 +256,18 @@ export default {
       type: Number,
       default: undefined
     },
+    verticalSpacing: {
+      type: String,
+      default: DEFAULT_VERTICAL_SPACING
+    },
+    navPrev: {
+      type: String,
+      default: null
+    },
+    navNext: {
+      type: String,
+      default: null
+    },
     handlePrevMonthClick: {
       type: Function,
       default: function() {}
@@ -174,17 +276,29 @@ export default {
       type: Function,
       default: function() {}
     },
+    handleFocusChange: {
+      type: Function,
+      default: function() {}
+    },
     handleClose: {
       type: Function,
       default: function() {}
     },
-    renderMonth: {
-      type: Function,
+    renderCalendarDay: {
+      type: String,
+      default: undefined
+    },
+    renderDayContents: {
+      type: String,
       default: null
     },
-    renderDay: {
-      type: Function,
+    renderMonthElement: {
+      type: String,
       default: null
+    },
+    minimumNights: {
+      type: Number,
+      default: 1
     },
     enableOutsideDays: {
       type: Boolean,
@@ -217,20 +331,34 @@ export default {
       default: "dd"
     },
     phrases: {
-      type: Object
-    }
+      type: Object,
+      default: function() {
+        return DateRangePickerPhrases;
+      }
+    },
+    dayAriaLabelFormat: {
+      type: String,
+      default: undefined
+    },
   },
   data() {
     return {
-      focused: this.autoFocus
+      focusedInput: null,
+      startDate: null,
+      endDate: null,
+      stateDateWrapper: function(date) {
+          return date
+      }
     };
   },
   methods: {
-    onDateChange(date) {
-      this.$emit("input", date);
+    onDatesChange({ startDate, endDate }) {
+      const { stateDateWrapper } = this;
+      this.startDate = startDate && stateDateWrapper(startDate)
+      this.endDate = endDate && stateDateWrapper(endDate)
     },
-    onFocusChange(e) {
-      this.focused = e.focused;
+    onFocusChange(focusedInput) {
+      this.focusedInput = focusedInput;
     }
   }
 };

@@ -368,7 +368,7 @@ export default {
       default: null
     },
     verticalHeight: {
-      type: String,
+      type: Number,
       default: null
     },
     transitionDuration: {
