@@ -50,7 +50,7 @@
       -->
 
       <div
-        v-if="isDateRangePickerInputFocused && focusedInput === 'startDate' || isDateRangePickerInputFocused && focusedInput === 'endDate'"
+        v-if="focusedInput"
         ref="container"
         class="DateRangePicker_picker"
         :class="containerClass"
@@ -115,6 +115,8 @@ import throttle from "lodash/throttle";
 import { XCircleIcon } from "vue-feather-icons";
 import isTouchDevice from 'is-touch-device';
 import OutsideClickHandler from "./outside-click-handler";
+import isInclusivelyAfterDay from '../utils/isInclusivelyAfterDay';
+import disableScroll from '../utils/disableScroll';
 import DateRangeInput from "./date-range-input.vue";
 import DateRangeInputController from "./date-range-input-controller.vue";
 import DateRangeController from "./date-range-controller.vue";
@@ -365,7 +367,7 @@ export default {
     },
     firstDayOfWeek: {
       type: Number,
-      default: null
+      default: 0
     },
     verticalHeight: {
       type: Number,
@@ -464,7 +466,13 @@ export default {
       type: String,
       default: 'dd'
     },
-    phrases: DateRangePickerPhrases,
+    // phrases: DateRangePickerPhrases,
+    phrases: {
+      type: Object,
+      default: function() {
+        return DateRangePickerPhrases;
+      }
+    },
     dayAriaLabelFormat: {
       type: String,
       default: undefined
@@ -494,7 +502,7 @@ export default {
       withAnyPortal: this.withPortal || this.withFullScreenPortal,
       initialVisibleMonthThunk: this.initialVisibleMonth || (
         () => (this.startDate || this.endDate || moment())
-      )
+      ),
     };
   },
 
@@ -601,9 +609,22 @@ export default {
     },
 
     onClearFocus() {
+      const {
+        onFocusChange,
+        onClose,
+        startDate,
+        endDate,
+        appendToBody,
+      } = this;
+      if (!this.isOpened()) return;
+      if (appendToBody && this.dayPickerContainer.contains(event.target)) return;
+
       this.isDateRangePickerInputFocused = false;
       this.isDayPickerFocused = false;
       this.showKeyboardShortcuts = false;
+
+      onFocusChange(null);
+      onClose({ startDate, endDate });
     },
 
     setDayPickerContainerRef(ref) {
@@ -627,7 +648,8 @@ export default {
       // Disable scroll for every ancestor of this DateRangePicker up to the
       // document level. This ensures the input and the picker never move. Other
       // sibling elements or the picker itself can scroll.
-      this.enableScroll = disableScroll(this.container);
+      // TODO: Uncomment and fix this
+      // this.enableScroll = disableScroll(this.container);
     },
 
     responsivizePickerPosition() {
@@ -649,13 +671,14 @@ export default {
       } = this;
       // const { dayPickerContainerStyles } = this.state;
 
-      const isAnchoredLeft = anchorDirection === ANCHOR_LEFT;
-      if (!withPortal && !withFullScreenPortal) {
-        const containerRect = this.dayPickerContainer.getBoundingClientRect();
-        const currentOffset = dayPickerContainerStyles[anchorDirection] || 0;
-        const containerEdge = isAnchoredLeft
-          ? containerRect[ANCHOR_RIGHT]
-          : containerRect[ANCHOR_LEFT];
+      // TODO: Uncomment this and fix
+      // const isAnchoredLeft = anchorDirection === ANCHOR_LEFT;
+      // if (!withPortal && !withFullScreenPortal) {
+      //   const containerRect = this.dayPickerContainer.getBoundingClientRect();
+      //   const currentOffset = dayPickerContainerStyles[anchorDirection] || 0;
+      //   const containerEdge = isAnchoredLeft
+      //     ? containerRect[ANCHOR_RIGHT]
+      //     : containerRect[ANCHOR_LEFT];
 
         // this.setState({
         //   dayPickerContainerStyles: {
@@ -672,7 +695,7 @@ export default {
         //     )),
         //   },
         // });
-      }
+      // }
     },
 
     showKeyboardShortcutsPanel() {
