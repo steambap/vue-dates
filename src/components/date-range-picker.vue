@@ -559,7 +559,6 @@ export default {
   methods: {
     
     onDateRangePickerInputFocus(focusedInput) {
-      console.log('onDateRangePickerInputFocus')
       const {
         onFocusChange,
         readOnly,
@@ -585,7 +584,6 @@ export default {
     },
 
     onDayPickerFocus() {
-      console.log('onDayPickerFocus')
       const { focusedInput, onFocusChange } = this;
       if (!focusedInput) onFocusChange(START_DATE);
 
@@ -600,7 +598,6 @@ export default {
     },
 
     onDayPickerBlur() {
-      console.log('onDayPickerBlur')
       // this.setState({
       //   isDateRangePickerInputFocused: true,
       //   isDayPickerFocused: false,

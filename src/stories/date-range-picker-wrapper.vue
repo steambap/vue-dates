@@ -356,11 +356,8 @@ export default {
       const { stateDateWrapper } = this;
       this.startDate = startDate && stateDateWrapper(startDate)
       this.endDate = endDate && stateDateWrapper(endDate)
-      console.log('onDatesChange start', this.startDate)
-      console.log('onDatesChange end', this.startDate)
     },
     onFocusChange(focusedInput) {
-      console.log('wrapper onFocusChange', focusedInput)
       this.focusedInput = focusedInput;
     }
   }
