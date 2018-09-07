@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="container"
     class="DateRangePicker"
     :class="{ DateRangePicker__block: block }"
   >
@@ -51,7 +52,7 @@
 
       <div
         v-if="focusedInput"
-        ref="container"
+        ref="dayPickerContainer"
         class="DateRangePicker_picker"
         :class="containerClass"
         :style="containerStyle"
@@ -650,8 +651,8 @@ export default {
       // Disable scroll for every ancestor of this DateRangePicker up to the
       // document level. This ensures the input and the picker never move. Other
       // sibling elements or the picker itself can scroll.
-      // TODO: Uncomment and fix this
-      // this.enableScroll = disableScroll(this.container);
+      const ctnr = this.$refs.container;
+      this.enableScroll = disableScroll(ctnr);
     },
 
     responsivizePickerPosition() {
@@ -674,7 +675,7 @@ export default {
       const { dayPickerContainerStyles } = this;
 
       const isAnchoredLeft = anchorDirection === ANCHOR_LEFT;
-      const ctnr = this.$refs.container;
+      const ctnr = this.$refs.dayPickerContainer;
       if (!withPortal && !withFullScreenPortal) {
         const containerRect = ctnr.getBoundingClientRect();
         const currentOffset = dayPickerContainerStyles[anchorDirection] || 0;
@@ -739,7 +740,7 @@ export default {
   computed: {
     containerStyle() {
       const { anchorDirection, horizontalMargin } = this;
-      const ctnr = this.$refs.container;
+      const ctnr = this.$refs.dayPickerContainer;
       if (!ctnr) {
         return {};
       }
