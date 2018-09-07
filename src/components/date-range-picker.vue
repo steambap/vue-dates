@@ -56,6 +56,7 @@
         :class="containerClass"
         :style="containerStyle"
       >
+      <!-- ref="container" -->
         <date-range-controller
           :orientation="orientation"
           :enableOutsideDays="enableOutsideDays"
@@ -503,11 +504,12 @@ export default {
       initialVisibleMonthThunk: this.initialVisibleMonth || (
         () => (this.startDate || this.endDate || moment())
       ),
+      dayPickerContainerStyles: {}
     };
   },
 
   created() {
-    // this.dayPickerContainerStyles = {}
+    this.dayPickerContainerStyles = {}
     this.isDateRangePickerInputFocused = false
     this.isDayPickerFocused = false
     this.showKeyboardShortcuts = false
@@ -655,7 +657,7 @@ export default {
     responsivizePickerPosition() {
       // It's possible the portal props have been changed in response to window resizes
       // So let's ensure we reset this back to the base state each time
-      // this.setState({ dayPickerContainerStyles: {} });
+      this.dayPickerContainerStyles = {};
 
       if (!this.isOpened()) {
         return;
@@ -669,33 +671,31 @@ export default {
         withFullScreenPortal,
         appendToBody,
       } = this;
-      // const { dayPickerContainerStyles } = this.state;
+      const { dayPickerContainerStyles } = this;
 
-      // TODO: Uncomment this and fix
-      // const isAnchoredLeft = anchorDirection === ANCHOR_LEFT;
-      // if (!withPortal && !withFullScreenPortal) {
-      //   const containerRect = this.dayPickerContainer.getBoundingClientRect();
-      //   const currentOffset = dayPickerContainerStyles[anchorDirection] || 0;
-      //   const containerEdge = isAnchoredLeft
-      //     ? containerRect[ANCHOR_RIGHT]
-      //     : containerRect[ANCHOR_LEFT];
+      const isAnchoredLeft = anchorDirection === ANCHOR_LEFT;
+      const ctnr = this.$refs.container;
+      if (!withPortal && !withFullScreenPortal) {
+        const containerRect = ctnr.getBoundingClientRect();
+        const currentOffset = dayPickerContainerStyles[anchorDirection] || 0;
+        const containerEdge = isAnchoredLeft
+          ? containerRect[ANCHOR_RIGHT]
+          : containerRect[ANCHOR_LEFT];
 
-        // this.setState({
-        //   dayPickerContainerStyles: {
-        //     ...getResponsiveContainerStyles(
-        //       anchorDirection,
-        //       currentOffset,
-        //       containerEdge,
-        //       horizontalMargin,
-        //     ),
-        //     ...(appendToBody && getDetachedContainerStyles(
-        //       openDirection,
-        //       anchorDirection,
-        //       this.container,
-        //     )),
-        //   },
-        // });
-      // }
+        this.dayPickerContainerStyles = {
+          ...getResponsiveContainerStyles(
+            anchorDirection,
+            currentOffset,
+            containerEdge,
+            horizontalMargin,
+          ),
+          ...(appendToBody && getDetachedContainerStyles(
+            openDirection,
+            anchorDirection,
+            this.container,
+          )),
+        }
+      }
     },
 
     showKeyboardShortcutsPanel() {
