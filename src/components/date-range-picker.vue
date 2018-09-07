@@ -46,9 +46,6 @@
         :regular="regular"
         :verticalSpacing="verticalSpacing"
       ></date-range-input-controller>
-      <!--
-        :handle-focus="onFocus"
-      -->
 
       <div
         v-if="focusedInput"
@@ -57,7 +54,6 @@
         :class="containerClass"
         :style="containerStyle"
       >
-      <!-- ref="container" -->
         <date-range-controller
           :orientation="orientation"
           :enableOutsideDays="enableOutsideDays"
@@ -167,48 +163,10 @@ export default {
       type: Function,
       default: function() {}
     },
-
-
     id: {
       type: String,
       default: null
     },
-    // placeholder: {
-    //   type: String,
-    //   default: null
-    // },
-    // focused: {
-    //   type: Boolean,
-    //   default: false
-    // },
-    // isInputFocused: {
-    //   type: String,
-    //   default: null
-    // },
-    // clearDate: {
-    //   type: String,
-    //   default: null
-    // },
-    // showClearDate: {
-    //   type: Boolean,
-    //   default: false
-    // },
-    // getDateString: {
-    //   type: Function,
-    //   default: null
-    // },
-    // date: {
-    //   type: String,
-    //   default: null
-    // },
-    // onChange: {
-    //   type: Function,
-    //   default: null
-    // },
-    // onFocus: {
-    //   type: Function,
-    //   default: null
-    // },
 
     // required props for a functional interactive DateRangePicker
     startDate: {
@@ -530,9 +488,6 @@ export default {
 
     const { focusedInput } = this;
     if (focusedInput) {
-      // this.setState({
-      //   isDateRangePickerInputFocused: true,
-      // });
       this.isDateRangePickerInputFocused = true;
     }
 
@@ -587,22 +542,12 @@ export default {
       const { focusedInput, onFocusChange } = this;
       if (!focusedInput) onFocusChange(START_DATE);
 
-      // this.setState({
-      //   isDateRangePickerInputFocused: false,
-      //   isDayPickerFocused: true,
-      //   showKeyboardShortcuts: false,
-      // });
       this.isDateRangePickerInputFocused = false;
       this.isDayPickerFocused = true;
       this.showKeyboardShortcuts = false;
     },
 
     onDayPickerBlur() {
-      // this.setState({
-      //   isDateRangePickerInputFocused: true,
-      //   isDayPickerFocused: false,
-      //   showKeyboardShortcuts: false,
-      // });
       this.isDateRangePickerInputFocused = true;
       this.isDayPickerFocused = false;
       this.showKeyboardShortcuts = false;
