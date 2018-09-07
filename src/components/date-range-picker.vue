@@ -334,7 +334,7 @@ export default {
       default: null
     },
     transitionDuration: {
-      type: String,
+      type: Number,
       default: undefined
     },
     verticalSpacing: {
