@@ -6,11 +6,11 @@
 
 ## Todo
 
-- [ ] DateRangePicker
+- [x] DateRangePicker
 - [x] DayPicker
 - [X] DayPickerRangeController
 - [x] DayPickerSingleDateController
-- [ ] PresetDateRangePicker
+- [x] PresetDateRangePicker
 - [x] PresetSingleDatePicker
 - [x] SingleDatePicker
 
