@@ -17,7 +17,8 @@
       :aria-label="phrases.focusStartDate"
       @click="handleKeyDownArrowDown"
     >
-      <calendar-icon class="DateRangePickerInput_calendarIcon_svg"></calendar-icon>
+      <slot name="custom-input-icon" v-if="$slots['custom-input-icon']"></slot>
+      <calendar-icon class="DateRangePickerInput_calendarIcon_svg" v-else></calendar-icon>
     </button>
     <date-input
       :id="startDateId"
@@ -31,15 +32,26 @@
       :readOnly="readOnly"
       :showCaret="showCaret"
       :openDirection="openDirection"
-      :onChange="onStartDateChange"
-      :handleFocus="onStartDateFocus"
-      :onKeyDownShiftTab="onStartDateShiftTab"
-      :onKeyDownArrowDown="onKeyDownArrowDown"
-      :onKeyDownQuestionMark="onKeyDownQuestionMark"
+      :handle-change="handleStartDateChange"
+      :handle-focus="handleStartDateFocus"
+      :handle-key-down-shift-tab="handleStartDateShiftTab"
+      :handle-key-down-arrow-down="handleKeyDownArrowDown"
+      :handle-key-down-question-mark="handleKeyDownQuestionMark"
       :verticalSpacing="verticalSpacing"
       :small="small"
       :regular="regular"
     ></date-input>
+
+    <div
+      class="DateRangePickerInput_arrow"
+      aria-hidden="true"
+      role="presentation"
+    >
+      <slot name="custom-arrow-icon" v-if="$slots['custom-arrow-icon']"></slot>
+      <arrow-left-icon v-if="!$slots['custom-arrow-icon'] && isRTL" class="DateRangePickerInput_arrow_svg"></arrow-left-icon>
+      <template v-if="!$slots['custom-arrow-icon'] && small">-</template>
+      <arrow-right-icon v-if="!$slots['custom-arrow-icon'] && !isRTL && !small" class="DateRangePickerInput_arrow_svg"></arrow-right-icon>
+    </div>
 
     <date-input
       :id="endDateId"
@@ -53,11 +65,11 @@
       :readOnly="readOnly"
       :showCaret="showCaret"
       :openDirection="openDirection"
-      :onChange="onEndDateChange"
-      :handleFocus="onEndDateFocus"
-      :onKeyDownTab="onEndDateTab"
-      :onKeyDownArrowDown="onKeyDownArrowDown"
-      :onKeyDownQuestionMark="onKeyDownQuestionMark"
+      :handle-change="handleEndDateChange"
+      :handle-focus="handleEndDateFocus"
+      :handle-key-down-tab="handleEndDateTab"
+      :handle-key-down-arrow-down="handleKeyDownArrowDown"
+      :handle-key-down-question-mark="handleKeyDownQuestionMark"
       :verticalSpacing="verticalSpacing"
       :small="small"
       :regular="regular"
@@ -74,7 +86,8 @@
       @click="handleClearDates"
       :disabled="disabled"
     >
-      <x-circle-icon></x-circle-icon>
+      <slot name="custom-close-icon" v-if="$slots['custom-close-icon']"></slot>
+      <x-circle-icon v-else></x-circle-icon>
     </button>
     <button
       v-if="showDefaultInputIcon && iconAfter"
@@ -84,13 +97,14 @@
       :aria-label="phrases.focusStartDate"
       @click="handleKeyDownArrowDown"
     >
-      <calendar-icon class="DateRangePickerInput_calendarIcon_svg"></calendar-icon>
+      <slot name="custom-input-icon" v-if="$slots['custom-input-icon']"></slot>
+      <calendar-icon class="DateRangePickerInput_calendarIcon_svg" v-else></calendar-icon>
     </button>
   </div>
 </template>
 
 <script>
-import { CalendarIcon, XCircleIcon } from "vue-feather-icons";
+import { CalendarIcon, XCircleIcon, ArrowLeftIcon, ArrowRightIcon } from "vue-feather-icons";
 import DateInput from "./date-input.vue";
 import {
   START_DATE,
@@ -104,7 +118,7 @@ import { DateRangePickerInputPhrases } from "../phrases";
 
 export default {
   name: "date-range-input",
-  components: { DateInput, CalendarIcon, XCircleIcon },
+  components: { DateInput, CalendarIcon, XCircleIcon, ArrowLeftIcon, ArrowRightIcon },
   props: {
     startDateId: {
       type: String,
@@ -116,60 +130,60 @@ export default {
     },
     startDatePlaceholderText: {
       type: String,
-      default: 'Start Date'
+      default: "Start Date"
     },
     endDatePlaceholderText: {
       type: String,
-      default: 'End Date'
+      default: "End Date"
     },
     screenReaderMessage: {
       type: String,
-      default: ''
+      default: ""
     },
-    onStartDateFocus: {
+    handleStartDateFocus: {
       type: Function,
       default: function() {}
     },
-    onEndDateFocus: {
+    handleEndDateFocus: {
       type: Function,
       default: function() {}
     },
-    onStartDateChange: {
+    handleStartDateChange: {
       type: Function,
       default: function() {}
     },
-    onEndDateChange: {
+    handleEndDateChange: {
       type: Function,
       default: function() {}
     },
-    onStartDateShiftTab: {
+    handleStartDateShiftTab: {
       type: Function,
       default: function() {}
     },
-    onEndDateTab: {
+    handleEndDateTab: {
       type: Function,
       default: function() {}
     },
-    onClearDates: {
+    handleClearDates: {
       type: Function,
       default: function() {}
     },
-    onKeyDownArrowDown: {
+    handleKeyDownArrowDown: {
       type: Function,
       default: function() {}
     },
-    onKeyDownQuestionMark: {
+    handleKeyDownQuestionMark: {
       type: Function,
       default: function() {}
     },
 
     startDate: {
       type: String,
-      default: ''
+      default: ""
     },
     endDate: {
       type: String,
-      default: ''
+      default: ""
     },
 
     isStartDateFocused: {
@@ -212,18 +226,6 @@ export default {
       type: String,
       default: ICON_BEFORE_POSITION
     },
-    customInputIcon: {
-      type: String,
-      default: null
-    },
-    customArrowIcon: {
-      type: String,
-      default: null
-    },
-    customCloseIcon: {
-      type: String,
-      default: null
-    },
     noBorder: {
       type: Boolean,
       default: false
@@ -254,20 +256,22 @@ export default {
     // i18n
     phrases: {
       type: Object,
-      default: DateRangePickerInputPhrases
+      default: function() {
+        return DateRangePickerInputPhrases
+      }
     },
 
     isRTL: {
       type: Boolean,
       default: false
-    },
+    }
   },
   data() {
     return {
       screenReaderText: this.screenReaderMessage || this.phrases.keyboardNavigationInstructions,
       startDateDisabled: this.disabled === START_DATE || this.disabled === true,
       endDateDisabled: this.disabled === END_DATE || this.disabled === true
-    }
+    };
   },
   computed: {
     iconBefore() {
@@ -306,7 +310,7 @@ export default {
 }
 .DateRangePickerInput_arrow_svg {
   vertical-align: middle;
-  fill: #565a5c;
+  /* fill: #565a5c; */
   height: 24px;
   width: 24px;
 }

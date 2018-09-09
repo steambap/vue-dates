@@ -1,7 +1,8 @@
 <template>
+<div>
   <date-range-picker
-    :onFocusChange="onFocusChange"
-    :onDatesChange="onDatesChange"
+    :handle-focus-change="onFocusChange"
+    :handle-dates-change="onDatesChange"
     :focusedInput="focusedInput"
     :startDate="startDate"
     :endDate="endDate"
@@ -13,12 +14,9 @@
     :required="required"
     :read-only="readOnly"
     :screen-reader-input-message="screenReaderInputMessage"
-    :show-clear-dates="showClearDate"
+    :show-clear-dates="showClearDates"
     :show-default-input-icon="showDefaultInputIcon"
     :input-icon-position="inputIconPosition"
-    :custom-input-icon="customInputIcon"
-    :custom-arrow-icon="customArrowIcon"
-    :custom-close-icon="customCloseIcon"
     :no-border="noBorder"
     :block="block"
     :small="small"
@@ -52,8 +50,7 @@
     :nav-next="navNext"
     :on-prev-month-click="handlePrevMonthClick"
     :on-next-month-click="handleNextMonthClick"
-    :on-close="handleClose"
-    :on-focus-change="handleFocusChange"
+    :handle-close="handleClose"
 
     :render-calendar-day="renderCalendarDay"
     :render-day-contents="renderDayContents"
@@ -68,7 +65,20 @@
     :week-day-format="weekDayFormat"
     :phrases="phrases"
     :day-aria-label-format="dayAriaLabelFormat"
-  ></date-range-picker>
+  >
+    <template slot="custom-input-icon">
+      <slot name="custom-input-icon"></slot>
+    </template>
+    <template slot="custom-arrow-icon">
+      <slot name="custom-arrow-icon"></slot>
+    </template>
+    <template slot="custom-close-icon">
+      <slot name="custom-close-icon"></slot>
+    </template>
+  </date-range-picker>
+
+  
+</div>
 </template>
 
 <script>
@@ -106,11 +116,11 @@ export default {
     },
     startDatePlaceholderText: {
       type: String,
-      default: 'Start Date'
+      default: "Start Date"
     },
     endDatePlaceholderText: {
       type: String,
-      default: 'End Date'
+      default: "End Date"
     },
     disabled: {
       type: Boolean,
@@ -128,7 +138,7 @@ export default {
       type: String,
       default: ""
     },
-    showClearDate: {
+    showClearDates: {
       type: Boolean,
       default: false
     },
@@ -139,18 +149,6 @@ export default {
     inputIconPosition: {
       type: String,
       default: ICON_BEFORE_POSITION
-    },
-    customInputIcon: {
-      type: String,
-      default: null
-    },
-    customArrowIcon: {
-      type: String,
-      default: null
-    },
-    customCloseIcon: {
-      type: String,
-      default: null
     },
     noBorder: {
       type: Boolean,
@@ -339,7 +337,7 @@ export default {
     dayAriaLabelFormat: {
       type: String,
       default: undefined
-    },
+    }
   },
   data() {
     return {
@@ -347,15 +345,15 @@ export default {
       startDate: null,
       endDate: null,
       stateDateWrapper: function(date) {
-          return date
+        return date;
       }
     };
   },
   methods: {
     onDatesChange({ startDate, endDate }) {
       const { stateDateWrapper } = this;
-      this.startDate = startDate && stateDateWrapper(startDate)
-      this.endDate = endDate && stateDateWrapper(endDate)
+      this.startDate = startDate && stateDateWrapper(startDate);
+      this.endDate = endDate && stateDateWrapper(endDate);
     },
     onFocusChange(focusedInput) {
       this.focusedInput = focusedInput;
