@@ -30,14 +30,14 @@
 </template>
 
 <script>
-import moment from 'moment';
+import moment from "moment";
 import DateRangeController from "../components/date-range-controller.vue";
 import { isInclusivelyAfterDay } from "../helpers";
 import { HORIZONTAL_ORIENTATION, START_DATE, END_DATE } from "../constants";
 
 export default {
-  name: 'date-range-controller-wrapper',
-  components: {DateRangeController},
+  name: "date-range-controller-wrapper",
+  components: { DateRangeController },
   props: {
     autoFocusEndDate: {
       type: Boolean,
@@ -142,5 +142,5 @@ export default {
       this.focusedInput = !focusedInput ? START_DATE : focusedInput;
     }
   }
-}
+};
 </script>

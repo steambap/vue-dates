@@ -1,37 +1,50 @@
 <template>
   <date-range-picker-input
-    :start-date="startDateString"
-    :start-date-id="startDateId"
-    :start-date-placeholder="startDatePlaceholder"
-    :is-start-date-focused="isStartDateFocused"
-    :end-date="endDateString"
-    :end-date-id="endDateId"
-    :end-date-placeholder="endDatePlaceholder"
-    :is-end-date-focused="isEndDateFocused"
-    :is-focused="isFocused"
-    :disabled="disabled"
-    :required="required"
-    :read-only="readOnly"
-    :open-direction="openDirection"
-    :show-caret="showCaret"
-    :show-default-input-icon="showDefaultInputIcon"
-    :input-icon-position="inputIconPosition"
-    :phrases="phrases"
-    :handle-start-date-change="onStartDateChange"
-    :handle-start-date-focus="onStartDateFocus"
-    :handle-start-date-shift-tab="onClearFocus"
-    :handle-end-date-change="onEndDateChange"
-    :handle-end-date-focus="onEndDateFocus"
-    :handle-end-date-tab="onClearFocus"
-    :show-clear-dates="showClearDates"
-    :handle-clear-dates="clearDates"
-    :screen-reader-message="screenReaderMessage"
-    :handle-key-down-arrow-down="handleKeyDownArrowDown"
-    :handle-key-down-question-mark="handleKeyDownQuestionMark"
-    :is-r-t-l="isRTL"
-    :no-border="noBorder"
-    :block="block"
-  ></date-range-picker-input>
+      :startDate="startDateString"
+      :startDateId="startDateId"
+      :startDatePlaceholderText="startDatePlaceholderText"
+      :isStartDateFocused="isStartDateFocused"
+      :endDate="endDateString"
+      :endDateId="endDateId"
+      :endDatePlaceholderText="endDatePlaceholderText"
+      :isEndDateFocused="isEndDateFocused"
+      :isFocused="isFocused"
+      :disabled="disabled"
+      :required="required"
+      :readOnly="readOnly"
+      :openDirection="openDirection"
+      :showCaret="showCaret"
+      :showDefaultInputIcon="showDefaultInputIcon"
+      :inputIconPosition="inputIconPosition"
+      :phrases="phrases"
+      :handle-start-date-change="onStartDateChange"
+      :handle-start-date-focus="onStartDateFocus"
+      :handle-start-date-shift-tab="onClearFocus"
+      :handle-end-date-change="onEndDateChange"
+      :handle-end-date-focus="onEndDateFocus"
+      :handle-end-date-tab="onClearFocus"
+      :showClearDates="showClearDates"
+      :handle-clear-dates="clearDates"
+      :screenReaderMessage="screenReaderMessage"
+      :handle-key-down-arrow-down="handleKeyDownArrowDown"
+      :handle-key-down-question-mark="handleKeyDownQuestionMark"
+      :isRTL="isRTL"
+      :noBorder="noBorder"
+      :block="block"
+      :small="small"
+      :regular="regular"
+      :verticalSpacing="verticalSpacing"
+  >
+      <template slot="custom-input-icon">
+        <slot name="custom-input-icon"></slot>
+      </template>
+      <template slot="custom-arrow-icon">
+        <slot name="custom-arrow-icon"></slot>
+      </template>
+      <template slot="custom-close-icon">
+        <slot name="custom-close-icon"></slot>
+      </template>
+  </date-range-picker-input>
 </template>
 
 <script>
@@ -49,11 +62,11 @@ import {
   END_DATE,
   ICON_BEFORE_POSITION,
   OPEN_DOWN
-} from "../contants";
+} from "../constants";
 
 export default {
   name: "date-range-input-controller",
-  components: {DateRangePickerInput},
+  components: { DateRangePickerInput },
   props: {
     startDate: {
       type: moment,
@@ -63,7 +76,7 @@ export default {
       type: String,
       default: START_DATE
     },
-    startDatePlaceholder: {
+    startDatePlaceholderText: {
       type: String,
       default: "Start Date"
     },
@@ -71,6 +84,7 @@ export default {
       type: Boolean,
       default: false
     },
+
     endDate: {
       type: moment,
       default: null
@@ -79,7 +93,7 @@ export default {
       type: String,
       default: END_DATE
     },
-    endDatePlaceholder: {
+    endDatePlaceholderText: {
       type: String,
       default: "End Date"
     },
@@ -87,6 +101,7 @@ export default {
       type: Boolean,
       default: false
     },
+
     screenReaderMessage: {
       type: String,
       default: ""
@@ -131,11 +146,28 @@ export default {
       type: Boolean,
       default: false
     },
+    small: {
+      type: Boolean,
+      default: false
+    },
+    regular: {
+      type: Boolean,
+      default: false
+    },
+    verticalSpacing: {
+      type: Number,
+      default: undefined
+    },
+
     keepOpenOnDateSelect: {
       type: Boolean,
       default: false
     },
     reopenPickerOnClearDates: {
+      type: Boolean,
+      default: false
+    },
+    withFullScreenPortal: {
       type: Boolean,
       default: false
     },
@@ -145,7 +177,9 @@ export default {
     },
     isOutsideRange: {
       type: Function,
-      default: function() {}
+      default: function(day) {
+        return !isInclusivelyAfterDay(day, moment());
+      }
     },
     displayFormat: {
       type: Function,
@@ -153,6 +187,7 @@ export default {
         return moment.localeData().longDateFormat("L");
       }
     },
+
     handleFocusChange: {
       type: Function,
       default: function() {}
@@ -173,19 +208,24 @@ export default {
       type: Function,
       default: function() {}
     },
-    isRTL: {
-      type: Boolean,
-      default: false
-    },
+
+    // accessibility
     isFocused: {
       type: Boolean,
       default: false
     },
+
+    // i18n
     phrases: {
       type: Object,
       default: function() {
-        return DateRangePickerInputPhrases;
+        return DateRangePickerInputPhrases
       }
+    },
+
+    isRTL: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
@@ -198,35 +238,34 @@ export default {
   },
   methods: {
     onClearFocus() {
-      const { handleFocusChange, handleClose, startDate, endDate } = this;
+      const {
+        handleFocusChange,
+        handleClose,
+        startDate,
+        endDate,
+      } = this;
 
       handleFocusChange(null);
       handleClose({ startDate, endDate });
     },
+
     onEndDateChange(endDateString) {
       const {
         startDate,
         isOutsideRange,
         minimumNights,
         keepOpenOnDateSelect,
-        handleDatesChange,
-        displayFormat
+        handleDatesChange
       } = this;
 
-      const endDate = toMomentObject(endDateString, displayFormat());
+      const endDate = toMomentObject(endDateString, this.getDisplayFormat());
 
-      const isEndDateValid =
-        endDate &&
-        !isOutsideRange(endDate) &&
-        !(
-          startDate &&
-          isBeforeDay(endDate, startDate.clone().add(minimumNights, "days"))
-        );
+      const isEndDateValid = endDate
+        && !isOutsideRange(endDate)
+        && !(startDate && isBeforeDay(endDate, startDate.clone().add(minimumNights, 'days')));
       if (isEndDateValid) {
         handleDatesChange({ startDate, endDate });
-        if (!keepOpenOnDateSelect) {
-          this.onClearFocus();
-        }
+        if (!keepOpenOnDateSelect) this.onClearFocus();
       } else {
         handleDatesChange({
           startDate,
@@ -234,30 +273,44 @@ export default {
         });
       }
     },
-    onEndDateFocus() {
-      const { startDate, handleFocusChange, disabled, displayFormat } = this;
 
-      if (!startDate && !disabled) {
+    onEndDateFocus() {
+      const {
+        startDate,
+        handleFocusChange,
+        withFullScreenPortal,
+        disabled,
+      } = this;
+
+      if (!startDate && withFullScreenPortal && (!disabled || disabled === END_DATE)) {
+        // When the datepicker is full screen, we never want to focus the end date first
+        // because there's no indication that that is the case once the datepicker is open and it
+        // might confuse the user
         handleFocusChange(START_DATE);
-      } else if (!disabled) {
+      } else if (!disabled || disabled === START_DATE) {
         handleFocusChange(END_DATE);
       }
     },
+
     onStartDateChange(startDateString) {
-      const startDate = toMomentObject(startDateString, displayFormat());
       let { endDate } = this;
       const {
         isOutsideRange,
         minimumNights,
         handleDatesChange,
-        handleFocusChange
+        handleFocusChange,
+        disabled
       } = this;
-      const isStartDateValid = startDate && isOutsideRange(startDate);
+
+      const startDate = toMomentObject(startDateString, this.getDisplayFormat());
+      const isEndDateBeforeStartDate = startDate
+        && isBeforeDay(endDate, startDate.clone().add(minimumNights, 'days'));
+      const isStartDateValid = startDate
+        && !isOutsideRange(startDate)
+        && !(disabled === END_DATE && isEndDateBeforeStartDate);
+
       if (isStartDateValid) {
-        if (
-          startDate &&
-          isBeforeDay(endDate, startDate.clone().add(minimumNights, "days"))
-        ) {
+        if (isEndDateBeforeStartDate) {
           endDate = null;
         }
 
@@ -270,24 +323,29 @@ export default {
         });
       }
     },
+
     onStartDateFocus() {
-      if (!this.disabled) {
-        this.handleFocusChange(START_DATE);
+      const { disabled, handleFocusChange } = this;
+      if (!disabled || disabled === END_DATE) {
+        handleFocusChange(START_DATE);
       }
     },
+
+    getDisplayFormat() {
+      const { displayFormat } = this;
+      return typeof displayFormat === 'string' ? displayFormat : displayFormat();
+    },
+
     getDateString(date) {
-      const displayFormat = this.displayFormat();
+      const displayFormat = this.getDisplayFormat();
       if (date && displayFormat) {
         return date && date.format(displayFormat);
       }
       return toLocalizedDateString(date);
     },
+
     clearDates() {
-      const {
-        handleDatesChange,
-        reopenPickerOnClearDates,
-        handleFocusChange
-      } = this;
+      const { handleDatesChange, reopenPickerOnClearDates, handleFocusChange } = this;
       handleDatesChange({ startDate: null, endDate: null });
       if (reopenPickerOnClearDates) {
         handleFocusChange(START_DATE);
